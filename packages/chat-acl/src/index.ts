@@ -1,3 +1,5 @@
+import * as KeyhiveWasm from '@keyhive/keyhive'
+
 export type ChatAccess = 'pull' | 'read' | 'comment' | 'edit' | 'admin'
 
 export interface AgentRef {
@@ -45,7 +47,7 @@ export function createAccessControlAdapter(config: AccessControlConfig = { mode:
   if (config.mode === 'mock') {
     return new InMemoryAccessControlAdapter(config.localMemberId ?? 'server-admin', config.publicKey ? new Uint8Array(config.publicKey) : undefined)
   }
-  throw new Error('keyhive-experimental ACL mode is not implemented yet')
+  return new KeyhiveAccessControlAdapter()
 }
 
 export class ForbiddenError extends Error {
@@ -143,4 +145,153 @@ export class InMemoryAccessControlAdapter implements AccessControlAdapter {
       throw new ForbiddenError(`missing ${acceptable.join('/')} access for ${resource}`)
     }
   }
+}
+
+export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
+  readonly #signer = KeyhiveWasm.Signer.generateMemory()
+  readonly #ciphertextStore = KeyhiveWasm.CiphertextStore.newInMemory()
+  readonly #events: Uint8Array[] = []
+  readonly #memberId: string
+  #keyhive?: Promise<KeyhiveWasm.Keyhive>
+  readonly #documents = new Map<string, KeyhiveWasm.Document>()
+  readonly #groups = new Map<string, KeyhiveWasm.Group>()
+  readonly #agents = new Map<string, KeyhiveWasm.Agent>()
+  readonly #adminTargets = new Set<string>()
+
+  constructor() {
+    this.#memberId = `keyhive:${bytesToHex(this.#signer.verifyingKey)}`
+  }
+
+  localMemberId(): string {
+    return this.#memberId
+  }
+
+  localPublicKey(): Uint8Array {
+    return new Uint8Array(this.#signer.verifyingKey)
+  }
+
+  async createWorkspace(_name: string): Promise<WorkspaceAccessBundle> {
+    const keyhive = await this.keyhive()
+    const group = await keyhive.generateGroup([])
+    const doc = await keyhive.generateDocument([group.toPeer()], randomChangeId(), [])
+    const workspaceGroupId = group.groupId.toString()
+    const workspaceDocumentId = doc.doc_id.toString()
+    this.#groups.set(workspaceGroupId, group)
+    this.#documents.set(workspaceDocumentId, doc)
+    this.#adminTargets.add(workspaceGroupId)
+    this.#adminTargets.add(workspaceDocumentId)
+    return { workspaceGroupId, workspaceDocumentId }
+  }
+
+  async createChannel(_workspace: WorkspaceAccessBundle, channelId: string): Promise<ChannelAccessBundle> {
+    const keyhive = await this.keyhive()
+    const doc = await keyhive.generateDocument([], randomChangeId(), [])
+    const channelDocumentId = doc.doc_id.toString()
+    this.#documents.set(channelDocumentId, doc)
+    this.#adminTargets.add(channelDocumentId)
+    this.#adminTargets.add(channelId)
+    return { channelId, channelDocumentId }
+  }
+
+  async receiveContactCard(cardJson: unknown): Promise<AgentRef> {
+    const keyhive = await this.keyhive()
+    const json = parseKeyhiveContactCardJson(cardJson)
+    const individual = await keyhive.receiveContactCard(KeyhiveWasm.ContactCard.fromJson(json))
+    const id = `keyhive:${bytesToHex(individual.individualId.bytes)}`
+    this.#agents.set(id, individual.toAgent())
+    return { id, kind: 'individual' }
+  }
+
+  async invite(agent: AgentRef, target: MemberedRef, access: ChatAccess): Promise<void> {
+    const keyhive = await this.keyhive()
+    const wasmAgent = this.#agents.get(agent.id)
+    const membered = this.memberedFor(target)
+    const keyhiveAccess = toKeyhiveAccess(access)
+    if (!wasmAgent) throw new ForbiddenError(`unknown Keyhive agent ${agent.id}`)
+    await keyhive.addMember(wasmAgent, membered, keyhiveAccess, [])
+  }
+
+  async revoke(agent: AgentRef, target: MemberedRef): Promise<void> {
+    const keyhive = await this.keyhive()
+    const wasmAgent = this.#agents.get(agent.id)
+    const membered = this.memberedFor(target)
+    if (!wasmAgent) throw new ForbiddenError(`unknown Keyhive agent ${agent.id}`)
+    await keyhive.revokeMember(wasmAgent, true, membered)
+  }
+
+  async assertCanRead(docOrChannel: string): Promise<void> {
+    if (!this.#adminTargets.has(docOrChannel) && !this.#documents.has(docOrChannel)) throw new ForbiddenError(`missing read access for ${docOrChannel}`)
+  }
+
+  async assertCanComment(channelId: string): Promise<void> {
+    if (!this.#adminTargets.has(channelId)) throw new ForbiddenError(`missing comment access for ${channelId}`)
+  }
+
+  async assertCanAdmin(target: string): Promise<void> {
+    if (!this.#adminTargets.has(target)) throw new ForbiddenError(`missing admin access for ${target}`)
+  }
+
+  async exportMembershipEventsFor(agent: AgentRef): Promise<Uint8Array[]> {
+    const keyhive = await this.keyhive()
+    const wasmAgent = this.#agents.get(agent.id)
+    if (!wasmAgent) return []
+    const events = await keyhive.eventsForAgent(wasmAgent)
+    return Array.from(events.values()).map((value) => new Uint8Array(value as ArrayBuffer | ArrayLike<number>))
+  }
+
+  async ingestMembershipEvents(events: Uint8Array[]): Promise<Uint8Array[]> {
+    const keyhive = await this.keyhive()
+    return (await keyhive.ingestEventsBytes(events)).map((event) => new Uint8Array(event as ArrayBuffer | ArrayLike<number>))
+  }
+
+  async exportArchiveBytes(): Promise<Uint8Array> {
+    return (await (await this.keyhive()).toArchive()).toBytes()
+  }
+
+  async exportOwnContactCardJson(): Promise<string> {
+    return (await (await this.keyhive()).contactCard()).toJson()
+  }
+
+  private keyhive(): Promise<KeyhiveWasm.Keyhive> {
+    this.#keyhive ??= KeyhiveWasm.Keyhive.init(this.#signer.clone(), this.#ciphertextStore, (event: unknown) => {
+      if (event && typeof event === 'object' && 'toBytes' in event && typeof event.toBytes === 'function') {
+        this.#events.push(new Uint8Array(event.toBytes() as Uint8Array))
+      }
+    })
+    return this.#keyhive
+  }
+
+  private memberedFor(target: MemberedRef): KeyhiveWasm.Membered {
+    const doc = this.#documents.get(target.id)
+    if (doc) return doc.toMembered()
+    const group = this.#groups.get(target.id)
+    if (group) return group.toMembered()
+    throw new ForbiddenError(`unknown Keyhive target ${target.id}`)
+  }
+}
+
+function parseKeyhiveContactCardJson(cardJson: unknown): string {
+  if (typeof cardJson === 'string') return cardJson
+  if (typeof cardJson === 'object' && cardJson && 'keyhiveContactCardJson' in cardJson) {
+    const nested = (cardJson as { keyhiveContactCardJson?: unknown }).keyhiveContactCardJson
+    if (typeof nested === 'string') return nested
+  }
+  return JSON.stringify(cardJson)
+}
+
+function toKeyhiveAccess(access: ChatAccess): KeyhiveWasm.Access {
+  const keyhiveAccess = KeyhiveWasm.Access.tryFromString(access === 'admin' ? 'admin' : access === 'edit' || access === 'comment' ? 'edit' : 'read')
+  if (!keyhiveAccess) throw new ForbiddenError(`unsupported Keyhive access ${access}`)
+  return keyhiveAccess
+}
+
+function randomChangeId(): KeyhiveWasm.ChangeId {
+  const bytes = new Uint8Array(32)
+  if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes)
+  else for (let i = 0; i < bytes.length; i += 1) bytes[i] = Math.floor(Math.random() * 256)
+  return new KeyhiveWasm.ChangeId(bytes)
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }

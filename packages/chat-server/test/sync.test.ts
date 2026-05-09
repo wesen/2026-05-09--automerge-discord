@@ -176,6 +176,7 @@ async function startServer(dataDir?: string): Promise<StartedServer> {
     dataDir: resolvedDataDir,
     publicBaseUrl: 'http://127.0.0.1:0',
     syncPath: '/sync',
+    aclMode: 'mock',
   }
   const chat = createChatServer(config)
   const server = await chat.listen()

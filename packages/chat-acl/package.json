@@ -16,5 +16,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@keyhive/keyhive": "^0.0.0-alpha.56c"
   }
 }

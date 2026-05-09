@@ -47,22 +47,22 @@
 
 ### Phase K5: Keyhive WASM spike
 
-- [ ] Decide whether to install from npm, git, or local vendored package.
-- [ ] Prove `Keyhive.init` in Node or browser/Vite.
-- [ ] Prove contact-card export/receive.
-- [ ] Prove group/document creation.
-- [ ] Prove addMember/revokeMember.
-- [ ] Prove event export/ingest or archive transfer.
-- [ ] Prove encrypt/decrypt for authorized peer.
-- [ ] Record exact package version, build settings, failures, and API gaps in diary.
+- [x] Decide whether to install from npm, git, or local vendored package.
+- [x] Prove `Keyhive.init` in Node or browser/Vite.
+- [x] Prove contact-card export/receive.
+- [x] Prove group/document creation.
+- [x] Prove addMember/revokeMember.
+- [x] Prove event export and archive serialization.
+- [ ] Prove encrypt/decrypt for authorized peer. Blocked: `tryEncrypt` currently throws `null pointer passed to rust` in the Node spike; recorded under scripts/03 and diary.
+- [x] Record exact package version, build settings, failures, and API gaps in diary.
 
 ### Phase K6: Experimental Keyhive adapter
 
-- [ ] Implement `KeyhiveAccessControlAdapter` behind the existing interface.
-- [ ] Add `ACL_MODE=mock|keyhive-experimental` selection.
-- [ ] Persist/load Keyhive archive state.
-- [ ] Convert membership events to/from JSON-safe base64 arrays.
-- [ ] Add tests gated for experimental mode.
+- [x] Implement `KeyhiveAccessControlAdapter` behind the existing interface.
+- [x] Add `ACL_MODE=mock|keyhive-experimental` selection.
+- [ ] Persist/load Keyhive archive state. Partial: adapter can export archive bytes, but durable signing-key/archive reload is not wired yet.
+- [x] Convert membership events to/from JSON-safe base64 arrays.
+- [x] Add tests gated for experimental mode.
 
 ### Phase K7: Beelay/E2EE research
 

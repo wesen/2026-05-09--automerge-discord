@@ -19,7 +19,7 @@ export function createChatServer(config: ServerConfig, deps: ChatServerDependenc
   const app = express()
   app.use(express.json({ limit: '1mb' }))
   const runtime = createRepoRuntime(config)
-  const acl = deps.acl ?? createAccessControlAdapter({ mode: 'mock' })
+  const acl = deps.acl ?? createAccessControlAdapter({ mode: config.aclMode })
 
   app.get('/healthz', (_req, res) => {
     res.json({ ok: true })

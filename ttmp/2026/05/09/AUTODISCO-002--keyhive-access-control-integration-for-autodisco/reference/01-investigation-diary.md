@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T14:38:00-04:00
+LastUpdated: 2026-05-09T15:00:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -815,3 +815,247 @@ Primary files changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/package.json`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/access.test.ts`
+
+## Step 10: Run Phase K5 Keyhive WASM spike and preserve scripts
+
+I ran the focused real-Keyhive spike after the user asked that all scripts be stored under the ticket. I retroactively copied every ad-hoc spike script from `/tmp` into the ticket `scripts/` folder and then continued the spike from those stored scripts.
+
+### Prompt Context
+
+**User prompt (verbatim):** "store all scripts you write in the scripts/ folder of the ticket, retroactively too. then continue"
+
+**Assistant interpretation:** Move temporary spike scripts into the docmgr ticket so the investigation is reproducible, then keep progressing through Phase K5.
+
+**Inferred user intent:** The user wants reusable, reviewable research artifacts rather than transient shell scratch files.
+
+### Scripts preserved
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/01-keyhive-node-spike-full.mjs`
+  - Full exploratory script including contact cards, group/document creation, delegation, encryption, decryption, and revocation.
+  - Currently demonstrates the encryption failure path.
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/02-keyhive-node-spike-stable.mjs`
+  - Stable reduced script for the parts that work reliably: init, contact-card receive, group/document creation, delegation, revocation, event count, and stats.
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/03-keyhive-encrypt-spike.mjs`
+  - Focused encryption/decryption reproduction script for the current Keyhive WASM failure.
+
+### What I did
+
+- Checked npm package availability:
+  - `@localfirst/keyhive` is not published on npm.
+  - `@keyhive/keyhive` exists, with `latest` at `0.0.0-alpha.0` and `next` at `0.0.0-alpha.56c`.
+- Installed `@keyhive/keyhive@next` into `@autodisco/chat-acl`.
+- Inspected `node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.d.ts` for the Node-facing API.
+- Proved in Node:
+  - `Keyhive.init(...)` works with `Signer.generateMemory()` and `CiphertextStore.newInMemory()`.
+  - `contactCard().toJson()` and `ContactCard.fromJson(...)` work.
+  - `receiveContactCard(...)` works.
+  - `generateGroup(...)` works.
+  - `generateDocument(...)` works.
+  - `Access.tryFromString('read')` returns `Read`.
+  - `addMember(...)` produces a signed delegation whose `verify()` returns true.
+  - `revokeMember(...)` returns revocation entries.
+  - `toArchive().toBytes()` serializes non-empty archive bytes.
+  - `eventsForAgent(...)` is callable.
+- Added a real Keyhive WASM spike test under `packages/chat-acl/test/keyhive-spike.test.ts` to lock in the working subset.
+- Marked the working Phase K5 tasks complete and explicitly recorded encryption/decryption as blocked.
+
+### What worked
+
+The stable ticket script passed:
+
+```bash
+node ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/02-keyhive-node-spike-stable.mjs
+```
+
+It produced JSON like:
+
+```json
+{
+  "a": "0x94cb98381735963fdcbd619edfa2b85132e670d1d48194e95b8d27a66cb2ac1a",
+  "b": "0x33c046b07129df865d5ba331615c78e87adea086a59571d7a4aa76228d9ce9",
+  "group": "0x0a2d46299758e5c256af873b68b5681e469c6aa0b9c50328fd0d394c416e3603",
+  "doc": "0x59f13867de29e8642311324bfb09b81d7ed1ff94f3953d9dfdeaf97325e98765",
+  "delegation": true,
+  "revocations": 1,
+  "events": 10,
+  "stats": "4"
+}
+```
+
+Full validation also passed:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+### What didn't work
+
+The first package name I checked was not published:
+
+```text
+npm error 404 '@localfirst/keyhive@*' is not in this registry.
+```
+
+The correct package for this spike was `@keyhive/keyhive@next`.
+
+Encryption/decryption is not proven yet. Both the larger exploratory script and the focused encryption script hit a WASM/Rust-side failure:
+
+```text
+Error: null pointer passed to rust
+    at __wbg___wbindgen_throw_81fc77679af83bc6 (.../node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)
+```
+
+The failure occurred around `tryEncrypt(...)`/`ChangeId` handling in the Node spike. This should be treated as a real API gap or usage mismatch before attempting an E2EE adapter.
+
+### What I learned
+
+The `@keyhive/keyhive@next` Node API is already sufficient for a real experimental ACL adapter that creates identities, contact cards, groups, documents, membership delegations, revocations, and archives. It is not yet sufficient, based on this spike alone, to claim working content encryption/decryption.
+
+Also, access strings are not exactly the app's mock access names:
+
+- `read` maps to `Read`.
+- `edit` maps to `Edit`.
+- `admin` maps to `Admin`.
+- `pull` returned `undefined` in the exploratory script.
+- `comment` returned `undefined` in the exploratory script.
+
+A real adapter will need an explicit mapping from AUTODISCO access levels to Keyhive's supported `Access` values.
+
+### What was tricky to build
+
+The Keyhive API uses WASM wrapper objects (`Signer`, `CiphertextStore`, `ChangeId`, `Document`, `Group`, `ContactCard`) heavily. Small ownership/reference mistakes can produce Rust-side failures that are less obvious than TypeScript errors. The stored scripts are therefore important reproducibility artifacts.
+
+### What warrants a second pair of eyes
+
+- Review the `tryEncrypt` usage against upstream examples or source; the `null pointer passed to rust` may indicate a bad `ChangeId` constructor usage, a moved/free object, or an API bug in `0.0.0-alpha.56c`.
+- Review whether `@keyhive/keyhive@next` should be committed as a production dependency now or moved behind an optional/dev dependency while the adapter is experimental.
+- Review access-level mapping: AUTODISCO has `pull/read/comment/edit/admin`, while the observed Keyhive API recognized `read/edit/admin`.
+
+### What should be done in the future
+
+Proceed to Phase K6 with a limited `KeyhiveAccessControlAdapter` that implements identity/contact-card/group/document/delegation/revocation/archive behavior, but explicitly leaves content encryption as unsupported until the `tryEncrypt` failure is resolved.
+
+### Code review instructions
+
+- Review the preserved scripts under the ticket `scripts/` directory.
+- Review `packages/chat-acl/test/keyhive-spike.test.ts` for the working real-Keyhive subset.
+- Review `packages/chat-acl/package.json` and `package-lock.json` for the new `@keyhive/keyhive@next` dependency.
+- Re-run the stable script and full validation commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/package-lock.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-spike.test.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/01-keyhive-node-spike-full.mjs`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/02-keyhive-node-spike-stable.mjs`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/03-keyhive-encrypt-spike.mjs`
+
+## Step 11: Implement limited experimental Keyhive adapter behind ACL seam
+
+I implemented the first real `KeyhiveAccessControlAdapter` behind the existing AUTODISCO ACL interface. It is intentionally limited and still marked experimental, but the mock/real adapter selection is now real code instead of only a design plan.
+
+### Prompt Context
+
+**User prompt (verbatim):** Continuing after the request to preserve scripts and continue.
+
+**Assistant interpretation:** Use the successful parts of the K5 spike to implement a constrained K6 adapter while preserving the known encryption/archive limitations.
+
+**Inferred user intent:** The user wants the project to keep moving from research into implementation, without overclaiming security or completeness.
+
+### What I did
+
+- Added `KeyhiveAccessControlAdapter` in `packages/chat-acl/src/index.ts`.
+- Updated `createAccessControlAdapter({ mode: 'keyhive-experimental' })` to return the real experimental adapter instead of throwing.
+- Implemented Keyhive-backed:
+  - local member id and public key exposure;
+  - workspace group/document creation;
+  - channel document creation;
+  - real Keyhive contact-card receive;
+  - member delegation via `addMember`;
+  - member revocation via `revokeMember`;
+  - membership event export/ingest plumbing;
+  - archive byte export;
+  - own real Keyhive contact-card JSON export for tests and future UI.
+- Added explicit AUTODISCO-to-Keyhive access mapping:
+  - `admin` -> `admin`;
+  - `edit`/`comment` -> `edit`;
+  - `read`/`pull` -> `read`.
+- Added `ACL_MODE=mock|keyhive-experimental` to server config.
+- Updated `createChatServer()` to choose the adapter from `config.aclMode` unless a test dependency injects a custom adapter.
+- Added `packages/chat-acl/test/keyhive-adapter.test.ts` for the experimental adapter.
+- Updated server tests to include explicit `aclMode: 'mock'` in test configs.
+
+### Why
+
+This keeps real Keyhive isolated behind the existing adapter seam. The server and web app can remain on stable mock mode by default, while developers can opt into the experimental real-Keyhive path with `ACL_MODE=keyhive-experimental`.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+The new experimental adapter tests passed:
+
+- creates real Keyhive workspace refs and archive bytes;
+- receives a real Keyhive contact card from another adapter instance;
+- delegates membership on a real Keyhive document;
+- exports membership events;
+- revokes membership;
+- denies admin checks for unknown targets.
+
+### What didn't work
+
+Durable archive reload is not complete. The adapter can export archive bytes, but a safe durable reload path also needs signing-key persistence. The observed Keyhive API exposes `Signer.memorySignerFromBytes(...)` but I did not find a corresponding safe private-key export in the current type declarations. I therefore left the ticket task as partial rather than pretending persistence is complete.
+
+Encryption/decryption remains blocked from Step 10.
+
+### What I learned
+
+A limited real adapter is viable now if it is scoped to identity, contact cards, groups, documents, membership, revocation, events, and archive export. It should not yet be used to claim E2EE or durable identity recovery.
+
+### What was tricky to build
+
+The Keyhive adapter must store WASM wrapper objects for documents, groups, and agents because later calls need `toMembered()` and real `Agent` instances, not only string ids. This reinforces the need for a persistence/reload design before using the adapter in real long-running scenarios.
+
+### What warrants a second pair of eyes
+
+- Review the `ChatAccess` to Keyhive `Access` mapping, especially `comment -> edit` and `pull -> read`.
+- Review whether `KeyhiveAccessControlAdapter` belongs in `index.ts` long-term or should move into a separate module before it grows.
+- Review whether `ACL_MODE` should be exposed through devctl service env for opt-in smoke testing.
+- Review signing-key persistence options in upstream Keyhive.
+
+### What should be done in the future
+
+Continue K6 by adding durable signing-key/archive persistence once the correct Keyhive API is verified, then add an opt-in devctl smoke command for `ACL_MODE=keyhive-experimental`.
+
+### Code review instructions
+
+- Review `packages/chat-acl/src/index.ts` for the new adapter and access mapping.
+- Review `packages/chat-acl/test/keyhive-adapter.test.ts` for the real adapter behavior under test.
+- Review `packages/chat-server/src/config.ts` and `packages/chat-server/src/app.ts` for `ACL_MODE` wiring.
+- Validate with the commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/config.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`

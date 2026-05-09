@@ -4,6 +4,7 @@ export interface ServerConfig {
   dataDir: string
   publicBaseUrl: string
   syncPath: string
+  aclMode: 'mock' | 'keyhive-experimental'
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
@@ -14,6 +15,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     dataDir: env.DATA_DIR ?? '.autodisco-data',
     publicBaseUrl: env.PUBLIC_BASE_URL ?? `http://localhost:${port}`,
     syncPath: env.SYNC_PATH ?? '/sync',
+    aclMode: env.ACL_MODE === 'keyhive-experimental' ? 'keyhive-experimental' : 'mock',
   }
 }
 

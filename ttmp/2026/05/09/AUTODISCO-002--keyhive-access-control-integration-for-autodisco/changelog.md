@@ -59,3 +59,25 @@ Implemented Phase K4 mock app-layer checks: browser send-message now passes thro
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/access/mockPermissions.ts — mock comment permission helper
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — visible permission-denied logging before send
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/access.test.ts — ACL grant/missing-grant tests
+
+## 2026-05-09
+
+Ran Phase K5 Keyhive WASM spike and preserved all ad-hoc scripts under the ticket `scripts/` directory. Installed `@keyhive/keyhive@next`, added a real WASM spike test for init/contact-card/group/document/delegate/revoke/archive behavior, and recorded `tryEncrypt` as currently blocked by `null pointer passed to rust`.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-spike.test.ts — real Keyhive WASM working-subset test
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/01-keyhive-node-spike-full.mjs — full exploratory spike and encryption failure reproduction
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/02-keyhive-node-spike-stable.mjs — stable working Keyhive API proof
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/03-keyhive-encrypt-spike.mjs — focused encryption/decryption failure reproduction
+
+## 2026-05-09
+
+Implemented a limited `KeyhiveAccessControlAdapter` behind the ACL seam and added `ACL_MODE=mock|keyhive-experimental` server selection. The adapter supports real Keyhive identity/contact-card/group/document/delegation/revocation/event/archive-export behavior, but durable archive reload and content encryption remain incomplete.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — experimental Keyhive adapter and adapter factory
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts — experimental adapter tests
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/config.ts — `ACL_MODE` selection
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — adapter factory wiring

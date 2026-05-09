@@ -15,6 +15,7 @@ describe('bootstrap HTTP API', () => {
       dataDir,
       publicBaseUrl: 'http://localhost:3030',
       syncPath: '/sync',
+      aclMode: 'mock',
     }
     const chat = createChatServer(config)
     const server = await chat.listen()

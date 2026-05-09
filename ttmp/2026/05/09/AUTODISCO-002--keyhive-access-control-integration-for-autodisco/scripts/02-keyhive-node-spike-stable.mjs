@@ -1,0 +1,11 @@
+import * as KH from '/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js';
+const events=[];
+const a = await KH.Keyhive.init(KH.Signer.generateMemory(), KH.CiphertextStore.newInMemory(), (e)=>events.push(e));
+const b = await KH.Keyhive.init(KH.Signer.generateMemory(), KH.CiphertextStore.newInMemory(), ()=>{});
+const peer = await a.receiveContactCard(KH.ContactCard.fromJson((await b.contactCard()).toJson()));
+const group = await a.generateGroup([]);
+const doc = await a.generateDocument([group.toPeer()], new KH.ChangeId(new Uint8Array(32)), []);
+const access = KH.Access.tryFromString('read');
+const delegation = await a.addMember(peer.toAgent(), doc.toMembered(), access, []);
+const revocations = await a.revokeMember(peer.toAgent(), true, doc.toMembered());
+console.log(JSON.stringify({a:a.idString,b:b.idString,group:group.groupId.toString(),doc:doc.doc_id.toString(),delegation:delegation.verify(),revocations:revocations.length,events:events.length,stats: String((await a.stats()).delegations)}));
