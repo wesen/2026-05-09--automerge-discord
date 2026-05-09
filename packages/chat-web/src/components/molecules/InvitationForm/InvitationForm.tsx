@@ -46,8 +46,9 @@ export function InvitationForm({ disabled, isLoading, workspaceDocumentId, error
         data-part="invite-contact-card"
         onChange={(event) => setContactCardJson(event.target.value)}
       />
+      <p data-part="form-hint">Access is the ACL level delegated to the pasted contact card. Use read for viewing, comment/edit for writing, and admin for further delegation.</p>
       <MacButton type="submit" disabled={!canSubmit}>{isLoading ? 'Creating…' : 'Create Invite'}</MacButton>
-      {workspaceDocumentId ? <p data-part="form-hint">Target: {workspaceDocumentId}</p> : <p data-part="form-hint">Create or open a workspace with ACL refs first.</p>}
+      {workspaceDocumentId ? <p data-part="form-hint">Target ACL document: {workspaceDocumentId}</p> : <p data-part="form-hint">Create or open a workspace with ACL refs first.</p>}
       {error ? <p data-part="form-error">{error}</p> : null}
     </form>
   )

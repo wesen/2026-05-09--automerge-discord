@@ -20,9 +20,18 @@ export interface CreateInvitationRequest {
   access: 'pull' | 'read' | 'comment' | 'edit' | 'admin'
 }
 
+export type AclMode = 'mock' | 'keyhive-experimental'
+
+export interface BootstrapStatusResponse {
+  aclMode: AclMode
+  localMemberId: string
+  publicKeyFingerprint: string
+  contactCardJson: string
+}
+
 export interface CreateInvitationResponse {
   invitationId: string
-  mode: 'mock'
+  mode: AclMode
   agent: { id: string; kind: 'individual' | 'group' | 'bot' }
   target: { id: string; kind: 'document' }
   access: CreateInvitationRequest['access']
@@ -36,7 +45,7 @@ export interface RevokeInvitationRequest {
 }
 
 export interface RevokeInvitationResponse {
-  mode: 'mock'
+  mode: AclMode
   agent: CreateInvitationResponse['agent']
   target: { id: string; kind: 'document' }
   revoked: true
@@ -46,6 +55,9 @@ export const bootstrapApi = createApi({
   reducerPath: 'bootstrapApi',
   baseQuery: fetchBaseQuery({ baseUrl: '/api/bootstrap' }),
   endpoints: (builder) => ({
+    getStatus: builder.query<BootstrapStatusResponse, void>({
+      query: () => '/status',
+    }),
     createWorkspace: builder.mutation<BootstrapWorkspaceResponse, BootstrapWorkspaceRequest>({
       query: (body) => ({
         url: '/workspaces',
@@ -70,4 +82,4 @@ export const bootstrapApi = createApi({
   }),
 })
 
-export const { useCreateWorkspaceMutation, useCreateInvitationMutation, useRevokeInvitationMutation } = bootstrapApi
+export const { useGetStatusQuery, useCreateWorkspaceMutation, useCreateInvitationMutation, useRevokeInvitationMutation } = bootstrapApi

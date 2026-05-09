@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Provider } from 'react-redux'
 import type { ChannelId } from '@autodisco/chat-core'
-import { useCreateInvitationMutation, useCreateWorkspaceMutation } from '../../features/bootstrap/bootstrapApi.js'
+import { useCreateInvitationMutation, useCreateWorkspaceMutation, useGetStatusQuery } from '../../features/bootstrap/bootstrapApi.js'
 import { canCommentInMockWorkspace } from '../../features/access/mockPermissions.js'
 import { store } from '../../app/store.js'
 import { fixtureIds, fixtureWorkspace } from '../../shared/fixtures.js'
@@ -43,6 +43,7 @@ export function HomePageContent() {
   const appendLog = useCallback((level: LogLevel, message: string, detail?: string) => {
     setLogs((entries) => [{ id: crypto.randomUUID(), at: new Date().toISOString(), level, message, detail }, ...entries].slice(0, 100))
   }, [])
+  const { data: bootstrapStatus } = useGetStatusQuery()
   const [createWorkspace, result] = useCreateWorkspaceMutation()
   const [createInvitation, invitationResult] = useCreateInvitationMutation()
   const workspaceState = useWorkspaceDoc(activeWorkspace?.workspaceDocUrl, activeWorkspace?.syncUrl)
@@ -55,6 +56,14 @@ export function HomePageContent() {
   const defaultSyncUrl = activeWorkspace?.syncUrl ?? result.data?.syncUrl ?? deriveDefaultSyncUrl()
   const joinUrl = useMemo(() => buildJoinUrl(activeWorkspace), [activeWorkspace])
   const workspaceDocumentId = workspaceState.doc?.keyhive?.workspaceDocumentId ?? activeWorkspace?.keyhive?.workspaceDocumentId
+  const aclMode = bootstrapStatus?.aclMode ?? 'mock'
+  const identityCard = aclMode === 'keyhive-experimental'
+    ? {
+        displayName: 'Server Keyhive Identity',
+        memberId: bootstrapStatus?.localMemberId ?? identity.memberId,
+        publicKeyFingerprint: bootstrapStatus?.publicKeyFingerprint ?? identity.publicKeyFingerprint,
+      }
+    : identity
 
   useEffect(() => {
     if (!activeWorkspace) return
@@ -95,9 +104,9 @@ export function HomePageContent() {
 
   async function copyContactCard() {
     try {
-      const contactCard = stringifyContactCard(identity)
+      const contactCard = bootstrapStatus?.contactCardJson ?? stringifyContactCard(identity)
       await copyToClipboard(contactCard)
-      appendLog('ok', 'Copied mock contact card', identity.memberId)
+      appendLog('ok', `Copied ${aclMode} contact card`, aclMode === 'keyhive-experimental' ? bootstrapStatus?.localMemberId : identity.memberId)
     } catch (error) {
       appendLog('error', 'Could not copy contact card', error instanceof Error ? error.message : String(error))
     }
@@ -107,10 +116,10 @@ export function HomePageContent() {
     if (!workspaceDocumentId) return
     try {
       const contactCard = JSON.parse(value.contactCardJson) as unknown
-      appendLog('info', 'Creating mock invitation', `${workspaceDocumentId} · ${value.access}`)
+      appendLog('info', `Creating ${aclMode} invitation`, `${workspaceDocumentId} · ${value.access}`)
       const invitation = await createInvitation({ workspaceDocumentId, contactCard, access: value.access }).unwrap()
       await copyToClipboard(JSON.stringify(invitation.invitation, null, 2))
-      appendLog('ok', 'Created and copied mock invitation', `${invitation.invitationId} · ${invitation.agent.id} · ${invitation.access}`)
+      appendLog('ok', `Created and copied ${invitation.mode} invitation`, `${invitation.invitationId} · ${invitation.agent.id} · ${invitation.access}`)
     } catch (error) {
       appendLog('error', 'Create invitation failed', error instanceof Error ? error.message : String(error))
     }
@@ -147,10 +156,10 @@ export function HomePageContent() {
         <MacPanel title="AUTODISCO">
           <p>Local-first Discord-like chatbot prototype. Monochrome, CRDT-backed, and ready for Keyhive access-control experiments.</p>
           <IdentityCard
-            displayName={identity.displayName}
-            memberId={identity.memberId}
-            publicKeyFingerprint={identity.publicKeyFingerprint}
-            mode="mock"
+            displayName={identityCard.displayName}
+            memberId={identityCard.memberId}
+            publicKeyFingerprint={identityCard.publicKeyFingerprint}
+            mode={aclMode}
             onCopyContactCard={() => void copyContactCard()}
           />
           <BootstrapWorkspaceForm isLoading={result.isLoading} error={error} onCreate={(name) => void createAndOpenWorkspace(name)} />

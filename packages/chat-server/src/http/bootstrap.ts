@@ -10,6 +10,20 @@ const CHAT_ACCESSES: ChatAccess[] = ['pull', 'read', 'comment', 'edit', 'admin']
 export function createBootstrapRouter(repo: Repo, config: ServerConfig, acl: AccessControlAdapter): Router {
   const router = Router()
 
+  router.get('/status', async (_req: Request, res: Response) => {
+    try {
+      const publicKey = acl.localPublicKey()
+      res.json({
+        aclMode: config.aclMode,
+        localMemberId: acl.localMemberId(),
+        publicKeyFingerprint: fingerprintPublicKey(publicKey),
+        contactCardJson: await acl.exportOwnContactCardJson(),
+      })
+    } catch (error) {
+      respondWithError(res, error)
+    }
+  })
+
   router.post('/workspaces', async (req: Request, res: Response) => {
     try {
       const name = parseWorkspaceName(req.body)
@@ -124,6 +138,12 @@ function parseRevokeRequest(body: unknown): { workspaceDocumentId: string; agent
   const agent = value.agent
   if (!workspaceDocumentId || !agent?.id || (agent.kind !== 'individual' && agent.kind !== 'group' && agent.kind !== 'bot')) return null
   return { workspaceDocumentId, agent: { id: String(agent.id), kind: agent.kind } }
+}
+
+function fingerprintPublicKey(publicKey: Uint8Array): string {
+  const hex = Buffer.from(publicKey).toString('hex')
+  if (hex.length <= 12) return hex
+  return `${hex.slice(0, 6)}…${hex.slice(-6)}`
 }
 
 function respondWithError(res: Response, error: unknown): void {

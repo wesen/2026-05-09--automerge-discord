@@ -124,3 +124,16 @@ Added a dedicated `keyhive` devctl profile. The default `development` profile re
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — added `keyhive` profile
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — ACL-mode env/defaults, validation, and launch notes
+
+## 2026-05-09
+
+Fixed Keyhive profile UI mode reporting. The server now exposes `/api/bootstrap/status`, the web client queries it, and the identity/contact-card card reflects the active ACL mode. In `keyhive` devctl mode, the card shows `keyhive-experimental` and copies the backend's real Keyhive contact card. Also clarified workspace-card labels and added explanatory copy for Automerge URL, Relay URL, Join Link, and invitation access.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — contact-card export on the ACL interface
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — `/api/bootstrap/status`
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts — status query/types
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — runtime ACL mode in the identity card
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx — clearer workspace sharing labels
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx — access-level explanation

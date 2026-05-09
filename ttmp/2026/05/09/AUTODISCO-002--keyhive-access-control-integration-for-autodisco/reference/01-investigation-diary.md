@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:36:00-04:00
+LastUpdated: 2026-05-09T16:44:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1246,3 +1246,49 @@ devctl up --profile keyhive --dry-run --timeout 30s --skip-build --skip-prepare
 ```
 
 The dry-run launch plan correctly passed `ACL_MODE=keyhive-experimental` and the separate Keyhive data directory to the `chat-server` service.
+
+## Step 16: Keyhive runtime status in the web UI
+
+The first Keyhive devctl profile run exposed a confusing UI issue: the top-left contact-card panel still displayed `MOCK` even though the server was running with `ACL_MODE=keyhive-experimental`.
+
+### Prompt Context
+
+**User prompt (verbatim):** "i started in keyhive mode but the copy contact card in the ui top left still says \"MOCK\""
+
+**Assistant interpretation:** The browser UI needs to ask the backend what ACL mode is actually running and show/copy the runtime contact card in Keyhive mode instead of always rendering the local mock browser contact card.
+
+### What changed
+
+- Added `GET /api/bootstrap/status` in `packages/chat-server/src/http/bootstrap.ts`.
+- Extended `AccessControlAdapter` with `exportOwnContactCardJson()`.
+- Implemented mock contact-card export for `InMemoryAccessControlAdapter` so the status endpoint works in both profiles.
+- Added RTK Query status support in `packages/chat-web/src/features/bootstrap/bootstrapApi.ts`.
+- Updated `HomePage` so the identity card uses server status:
+  - default development profile shows `mock`;
+  - Keyhive profile shows `keyhive-experimental`;
+  - copy contact card copies the backend adapter contact card, which is a real Keyhive contact card in Keyhive mode.
+- Renamed workspace card labels to be less cryptic:
+  - `Doc` -> `Automerge URL`;
+  - `Sync` -> `Relay URL`;
+  - `Join` -> `Join Link`.
+- Added inline explanatory copy that the Automerge URL identifies the shared document, the Relay URL is the websocket sync server, and the Join Link bundles both for another browser session.
+- Added invitation-form explanatory copy for access levels.
+
+### Answer to the UX question
+
+The Automerge URL and Join Link are not placeholders. They are low-level prototype controls:
+
+- The Automerge URL is the document identifier used by Automerge Repo.
+- The Relay URL is the websocket sync endpoint.
+- The Join Link combines the app URL, Automerge URL, Relay URL, and label so another browser session can open the same workspace.
+- The invite access selector is the ACL level to delegate to the pasted contact card. In mock mode it is product-shaped ACL metadata; in Keyhive mode it calls real Keyhive delegation. It is not yet a complete end-user invitation acceptance flow.
+
+### Validation
+
+```bash
+npm run typecheck
+npm test
+npm run build
+```
+
+All validation passed.

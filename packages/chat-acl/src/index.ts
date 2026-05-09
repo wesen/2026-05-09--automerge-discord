@@ -35,6 +35,7 @@ export interface AccessControlAdapter {
   assertCanAdmin(target: string): Promise<void>
   exportMembershipEventsFor(agent: AgentRef): Promise<Uint8Array[]>
   ingestMembershipEvents(events: Uint8Array[]): Promise<Uint8Array[]>
+  exportOwnContactCardJson(): Promise<string>
 }
 
 export interface KeyhiveAccessControlSnapshot {
@@ -146,6 +147,16 @@ export class InMemoryAccessControlAdapter implements AccessControlAdapter {
 
   async ingestMembershipEvents(_events: Uint8Array[]): Promise<Uint8Array[]> {
     return []
+  }
+
+  async exportOwnContactCardJson(): Promise<string> {
+    return JSON.stringify({
+      kind: 'autodisco.contact-card.v1',
+      mode: 'mock',
+      agent: { id: this.#memberId, kind: 'individual' },
+      publicKey: bytesToBase64(this.#publicKey),
+      createdAt: new Date().toISOString(),
+    })
   }
 
   grant(resource: string, access: ChatAccess): void {
@@ -397,6 +408,12 @@ function randomBytes(length: number): Uint8Array {
 
 function bytesToHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = ''
+  for (const byte of bytes) binary += String.fromCharCode(byte)
+  return btoa(binary)
 }
 
 function hexToBytes(hex: string): Uint8Array {
