@@ -17,6 +17,12 @@ topics:
       description: Topic used by AUTODISCO-001 research and design.
     - slug: access-control
       description: Topic used by AUTODISCO-001 research and design.
+    - slug: e2ee
+      description: End-to-end encryption and related encrypted sync or storage work.
+    - slug: invitation
+      description: Invitation, join, contact-card, and member onboarding flows.
+    - slug: local-first
+      description: Local-first software, offline-capable sync, and peer-owned state.
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes
