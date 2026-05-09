@@ -32,11 +32,11 @@
 
 ### Phase K3: Invitation API and UI
 
-- [ ] Add invitations router with contact-card receive, invite, and revoke endpoints.
-- [ ] Add server tests for invite/revoke allow and deny cases.
-- [ ] Add RTK Query invitation API client.
-- [ ] Add `InviteMemberForm` component and Storybook stories.
-- [ ] Wire invite actions into `HomePage` and debug log.
+- [x] Add invitations router with contact-card receive, invite, and revoke endpoints.
+- [x] Add server tests for invite/revoke allow and deny cases.
+- [x] Add RTK Query invitation API client.
+- [x] Add `InvitationForm` component and Storybook stories.
+- [x] Wire invite actions into `HomePage` and debug log.
 
 ### Phase K4: App-layer ACL enforcement
 

@@ -93,6 +93,12 @@ export class InMemoryAccessControlAdapter implements AccessControlAdapter {
   }
 
   async receiveContactCard(cardJson: unknown): Promise<AgentRef> {
+    if (typeof cardJson === 'object' && cardJson && 'agent' in cardJson) {
+      const agent = (cardJson as { agent?: { id?: unknown; kind?: unknown } }).agent
+      if (agent?.id && (agent.kind === 'individual' || agent.kind === 'group' || agent.kind === 'bot')) {
+        return { id: String(agent.id), kind: agent.kind }
+      }
+    }
     const id = typeof cardJson === 'object' && cardJson && 'id' in cardJson ? String(cardJson.id) : `agent:${Date.now()}`
     return { id, kind: 'individual' }
   }

@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T14:25:00-04:00
+LastUpdated: 2026-05-09T14:32:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -639,3 +639,99 @@ Primary files changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/IdentityCard/IdentityCard.stories.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/index.css`
+
+## Step 8: Implement Phase K3 mock invitation API and UI
+
+I implemented the mock invitation flow that uses the contact cards from Phase K2 and the workspace ACL refs from Phase K1. The server can now receive a contact card, assert admin access for the workspace document, create a mock invite grant, revoke that grant, and return a product-shaped invitation payload. The web client can paste a contact card JSON blob, choose access, call the invitation API, copy the resulting invite JSON, and write debug-log entries.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same implementation prompt and "I expect you to be done when i come back" follow-up)
+
+**Assistant interpretation:** Continue advancing the ticket through the next concrete implementation phase and keep validation/delivery notes current.
+
+**Inferred user intent:** The user wants a demonstrable end-to-end mock access-control product flow, not only backend metadata.
+
+### What I did
+
+- Updated `InMemoryAccessControlAdapter.receiveContactCard()` to parse the nested `agent` object emitted by mock contact cards.
+- Added `POST /api/bootstrap/invitations`:
+  - validates `workspaceDocumentId`, `contactCard`, and optional `access`;
+  - checks `acl.assertCanAdmin(workspaceDocumentId)`;
+  - receives the contact card;
+  - calls `acl.invite(agent, target, access)`;
+  - exports mock membership events;
+  - returns a product-shaped `autodisco.invitation.v1` JSON payload.
+- Added `POST /api/bootstrap/invitations/revoke` for mock grant revocation.
+- Added forbidden handling so invite attempts against unknown/non-admin document ids return HTTP 403.
+- Extended server integration tests to cover successful invite creation, denied invite creation, and successful revoke.
+- Extended the RTK Query bootstrap API with create/revoke invitation mutations.
+- Added `InvitationForm` molecule and Storybook stories.
+- Rendered `InvitationForm` in `HomePage` when a workspace document id is available.
+- Added web behavior to parse pasted contact-card JSON, create the invitation, copy the returned invitation JSON, and emit debug-log entries.
+- Marked Phase K3 tasks complete.
+
+### Why
+
+This makes the access-control flow visible and testable without claiming real Keyhive security. It lets a user perform a recognizable “copy my contact card / paste contact card / create invite” sequence, while keeping all security semantics clearly in mock mode.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+The existing Automerge browser sync test remains green.
+
+### What didn't work
+
+The first TypeScript run failed because I attempted to call `newId('inv')`, but `chat-core` restricts id prefixes to the existing `IdPrefix` union:
+
+```text
+Argument of type '"inv"' is not assignable to parameter of type 'IdPrefix'.
+```
+
+I fixed this by using a simple `inv_${Date.now().toString(36)}` identifier for mock invitations rather than changing the core id-prefix taxonomy during this focused step.
+
+### What I learned
+
+The current ACL seam was sufficient for a mock invite flow: `receiveContactCard`, `invite`, `revoke`, `assertCanAdmin`, and `exportMembershipEventsFor` already mapped well to the product flow.
+
+### What was tricky to build
+
+The server needs to make it explicit that these grants are not real security. I kept response payloads marked with `mode: 'mock'`, preserved the `autodisco.invitation.v1` kind, and did not add any authorization checks to Automerge sync itself.
+
+### What warrants a second pair of eyes
+
+- Review whether `/api/bootstrap/invitations` belongs under `bootstrap` or should move to `/api/access` before the API settles.
+- Review whether `inv_${Date.now()}` is acceptable for mock mode or whether core should add an `inv` prefix.
+- Review whether the UI should include a stored invite history rather than immediately copying the newest invite.
+
+### What should be done in the future
+
+Proceed to Phase K4/K5: add an accept-invite UI/server stub and then run the real Keyhive WASM spike behind `keyhive-experimental`.
+
+### Code review instructions
+
+- Review `packages/chat-server/src/http/bootstrap.ts` for invitation/revoke API behavior and error handling.
+- Review `packages/chat-server/test/bootstrap.test.ts` for allow/deny/revoke coverage.
+- Review `packages/chat-web/src/features/bootstrap/bootstrapApi.ts` for RTK Query types and mutations.
+- Review `packages/chat-web/src/components/molecules/InvitationForm` and `HomePage` for UI flow.
+- Validate with the commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`

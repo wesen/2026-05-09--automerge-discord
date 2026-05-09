@@ -38,3 +38,14 @@ Implemented Phase K2 mock identity/contact-card UI: browser identities now inclu
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/identity.ts — mock identity and contact-card helpers
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/IdentityCard — identity/contact-card UI and stories
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — identity card rendering and contact-card copy logging
+
+## 2026-05-09
+
+Implemented Phase K3 mock invitations: server exposes create/revoke invitation endpoints backed by the ACL adapter, tests cover allow/deny/revoke cases, RTK Query exposes invitation mutations, and the web UI can paste a contact card and copy a generated mock invitation.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — invitation/revoke API
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — invitation allow/deny/revoke assertions
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts — invitation RTK Query mutations
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm — invite UI and stories

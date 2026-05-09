@@ -47,6 +47,58 @@ describe('bootstrap HTTP API', () => {
         workspaceDocumentId: body.keyhive.workspaceDocumentId,
         channelDocumentIds: {},
       })
+
+      const inviteResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          workspaceDocumentId: body.keyhive.workspaceDocumentId,
+          access: 'read',
+          contactCard: {
+            kind: 'autodisco.contact-card.v1',
+            mode: 'mock',
+            agent: { id: 'mem_peer', kind: 'individual' },
+            publicKey: 'mock-public-key',
+          },
+        }),
+      })
+      const inviteBody = (await inviteResponse.json()) as {
+        invitationId: string
+        mode: string
+        agent: { id: string; kind: string }
+        target: { id: string; kind: string }
+        access: string
+      }
+      expect(inviteResponse.status).toBe(201)
+      expect(inviteBody.invitationId).toMatch(/^inv_/)
+      expect(inviteBody.mode).toBe('mock')
+      expect(inviteBody.agent).toEqual({ id: 'mem_peer', kind: 'individual' })
+      expect(inviteBody.target).toEqual({ id: body.keyhive.workspaceDocumentId, kind: 'document' })
+      expect(inviteBody.access).toBe('read')
+
+      const denyResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          workspaceDocumentId: 'doc:unknown',
+          access: 'read',
+          contactCard: { agent: { id: 'mem_peer', kind: 'individual' } },
+        }),
+      })
+      expect(denyResponse.status).toBe(403)
+
+      const revokeResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations/revoke`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          workspaceDocumentId: body.keyhive.workspaceDocumentId,
+          agent: inviteBody.agent,
+        }),
+      })
+      const revokeBody = (await revokeResponse.json()) as { revoked: boolean; agent: { id: string } }
+      expect(revokeResponse.status).toBe(200)
+      expect(revokeBody.revoked).toBe(true)
+      expect(revokeBody.agent.id).toBe('mem_peer')
     } finally {
       chat.runtime.wss.close()
       await new Promise<void>((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())))

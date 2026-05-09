@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Provider } from 'react-redux'
 import type { ChannelId } from '@autodisco/chat-core'
-import { useCreateWorkspaceMutation } from '../../features/bootstrap/bootstrapApi.js'
+import { useCreateInvitationMutation, useCreateWorkspaceMutation } from '../../features/bootstrap/bootstrapApi.js'
 import { store } from '../../app/store.js'
 import { fixtureIds, fixtureWorkspace } from '../../shared/fixtures.js'
 import { MacPanel } from '../../components/atoms/MacPanel/index.js'
 import { BootstrapWorkspaceForm } from '../../components/molecules/BootstrapWorkspaceForm/index.js'
 import { IdentityCard } from '../../components/molecules/IdentityCard/index.js'
+import { InvitationForm, type InvitationFormValue } from '../../components/molecules/InvitationForm/index.js'
 import { OpenWorkspaceForm, type OpenWorkspaceFormValue } from '../../components/molecules/OpenWorkspaceForm/index.js'
 import { WorkspaceCard, type WorkspaceCopyKind } from '../../components/molecules/WorkspaceCard/index.js'
 import { ChatShell } from '../../components/organisms/ChatShell/index.js'
@@ -42,6 +43,7 @@ export function HomePageContent() {
     setLogs((entries) => [{ id: crypto.randomUUID(), at: new Date().toISOString(), level, message, detail }, ...entries].slice(0, 100))
   }, [])
   const [createWorkspace, result] = useCreateWorkspaceMutation()
+  const [createInvitation, invitationResult] = useCreateInvitationMutation()
   const workspaceState = useWorkspaceDoc(activeWorkspace?.workspaceDocUrl, activeWorkspace?.syncUrl)
   useEnsureWorkspaceReady(workspaceState.handle, workspaceState.doc, identity)
   const actions = useWorkspaceActions(workspaceState.handle, identity)
@@ -51,6 +53,7 @@ export function HomePageContent() {
   const syncStatus = workspaceState.status === 'ready' ? 'ok' : workspaceState.status === 'error' ? 'error' : activeWorkspace ? 'warn' : 'idle'
   const defaultSyncUrl = activeWorkspace?.syncUrl ?? result.data?.syncUrl ?? deriveDefaultSyncUrl()
   const joinUrl = useMemo(() => buildJoinUrl(activeWorkspace), [activeWorkspace])
+  const workspaceDocumentId = workspaceState.doc?.keyhive?.workspaceDocumentId ?? activeWorkspace?.keyhive?.workspaceDocumentId
 
   useEffect(() => {
     if (!activeWorkspace) return
@@ -94,6 +97,19 @@ export function HomePageContent() {
     }
   }
 
+  async function createWorkspaceInvitation(value: InvitationFormValue) {
+    if (!workspaceDocumentId) return
+    try {
+      const contactCard = JSON.parse(value.contactCardJson) as unknown
+      appendLog('info', 'Creating mock invitation', `${workspaceDocumentId} · ${value.access}`)
+      const invitation = await createInvitation({ workspaceDocumentId, contactCard, access: value.access }).unwrap()
+      await copyToClipboard(JSON.stringify(invitation.invitation, null, 2))
+      appendLog('ok', 'Created and copied mock invitation', `${invitation.invitationId} · ${invitation.agent.id} · ${invitation.access}`)
+    } catch (error) {
+      appendLog('error', 'Create invitation failed', error instanceof Error ? error.message : String(error))
+    }
+  }
+
   async function copyWorkspaceValue(kind: WorkspaceCopyKind, value: string) {
     try {
       await copyToClipboard(value)
@@ -133,6 +149,13 @@ export function HomePageContent() {
           />
           <BootstrapWorkspaceForm isLoading={result.isLoading} error={error} onCreate={(name) => void createAndOpenWorkspace(name)} />
           <OpenWorkspaceForm defaultSyncUrl={defaultSyncUrl} onOpen={openWorkspace} />
+          <InvitationForm
+            workspaceDocumentId={workspaceDocumentId}
+            disabled={!workspaceDocumentId}
+            isLoading={invitationResult.isLoading}
+            error={invitationResult.isError ? 'Could not create invitation.' : undefined}
+            onCreateInvitation={(value) => void createWorkspaceInvitation(value)}
+          />
           <WorkspaceCard
             name={workspaceState.doc?.name ?? activeWorkspace?.label ?? 'No workspace yet'}
             workspaceDocUrl={activeWorkspace?.workspaceDocUrl}
