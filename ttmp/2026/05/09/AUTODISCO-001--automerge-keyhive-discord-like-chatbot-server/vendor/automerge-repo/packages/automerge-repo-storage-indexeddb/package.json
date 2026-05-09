@@ -1,0 +1,28 @@
+{
+  "name": "@automerge/automerge-repo-storage-indexeddb",
+  "version": "2.5.5",
+  "description": "IndexedDB storage adapter for Automerge Repo",
+  "repository": "https://github.com/automerge/automerge-repo/tree/master/packages/automerge-repo-storage-indexeddb",
+  "author": "Peter van Hardenberg <pvh@pvh.ca>",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "npm-watch build"
+  },
+  "dependencies": {
+    "@automerge/automerge-repo": "workspace:*"
+  },
+  "watch": {
+    "build": {
+      "patterns": "./src/**/*",
+      "extensions": [
+        ".ts"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

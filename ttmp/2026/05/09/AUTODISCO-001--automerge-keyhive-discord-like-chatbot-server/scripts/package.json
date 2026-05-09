@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@automerge/automerge": "latest"
+  },
+  "scripts": {
+    "smoke:chat-model": "node automerge-chat-model-smoke.mjs"
+  }
+}

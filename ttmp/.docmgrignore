@@ -1,0 +1,14 @@
+# Default ignores for docmgr
+.git/
+_templates/
+_guidelines/
+# AUTODISCO-001 stores third-party clones and raw captured web markdown as source artifacts.
+# They are not docmgr-authored documents and do not carry docmgr frontmatter.
+vendor/
+sources/
+**/vendor/
+**/sources/
+2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/vendor/
+2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/vendor/**
+2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/sources/
+2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/sources/**
