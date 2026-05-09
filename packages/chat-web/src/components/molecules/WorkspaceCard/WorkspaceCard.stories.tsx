@@ -9,6 +9,8 @@ const meta = {
     workspaceDocUrl: 'automerge:3igFJLhCPexfV2mWwkEB9eB14eQC',
     syncUrl: 'ws://localhost:3030/sync',
     joinUrl: 'http://127.0.0.1:5174/?doc=automerge%3A3igFJLhCPexfV2mWwkEB9eB14eQC&sync=ws%3A%2F%2Flocalhost%3A3030%2Fsync',
+    workspaceGroupId: 'group:Intern Guild',
+    workspaceDocumentId: 'doc:Intern Guild',
     status: 'ok',
     onCopy: (kind, value) => console.log('copy', kind, value),
     onResetLocal: () => console.log('reset local'),

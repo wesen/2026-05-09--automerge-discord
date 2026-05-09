@@ -1,13 +1,14 @@
-import type { ChannelMessagesDoc, WorkspaceDoc, WorkspaceId } from './types.js'
+import type { ChannelMessagesDoc, KeyhiveRefs, WorkspaceDoc, WorkspaceId } from './types.js'
 
 export interface CreateWorkspaceInput {
   workspaceId: WorkspaceId
   name: string
   createdAt: string
+  keyhive?: KeyhiveRefs
 }
 
 export function createWorkspaceDoc(input: CreateWorkspaceInput): WorkspaceDoc {
-  return {
+  const doc: WorkspaceDoc = {
     schemaVersion: 1,
     workspaceId: input.workspaceId,
     name: input.name,
@@ -20,6 +21,8 @@ export function createWorkspaceDoc(input: CreateWorkspaceInput): WorkspaceDoc {
     botConfigs: {},
     botRuns: {},
   }
+  if (input.keyhive) doc.keyhive = input.keyhive
+  return doc
 }
 
 export function createChannelMessagesDoc(input: {

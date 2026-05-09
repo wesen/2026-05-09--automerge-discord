@@ -16,3 +16,15 @@
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/sources/01-source-list.md — Evidence inventory
 - Validated ticket metadata with `docmgr doctor --ticket AUTODISCO-002 --stale-after 30`.
 - Uploaded the documentation bundle to reMarkable at `/ai/2026/05/09/AUTODISCO-002/AUTODISCO-002_Keyhive_Access_Control_Guide.pdf`.
+
+## 2026-05-09
+
+Implemented Phase K1 mock ACL metadata wiring: workspace bootstrap now creates mock access-control refs, stores them in `WorkspaceDoc.keyhive`, returns them in bootstrap JSON, and displays/copies them in the web workspace card.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — ACL adapter factory
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/workspace.ts — optional Keyhive refs in workspace constructor
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — bootstrap ACL metadata creation and response
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — bootstrap metadata assertions
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx — ACL ref display/copy UI

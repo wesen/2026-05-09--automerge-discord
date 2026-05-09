@@ -18,6 +18,10 @@ interface ActiveWorkspace {
   workspaceDocUrl: string
   syncUrl: string
   label: string
+  keyhive?: {
+    workspaceGroupId: string
+    workspaceDocumentId: string
+  }
 }
 
 export function HomePage() {
@@ -58,7 +62,7 @@ export function HomePageContent() {
     appendLog('info', 'Creating workspace through bootstrap API', name)
     try {
       const created = await createWorkspace({ name }).unwrap()
-      const active = { workspaceDocUrl: created.workspaceDocUrl, syncUrl: created.syncUrl, label: created.workspaceId }
+      const active = { workspaceDocUrl: created.workspaceDocUrl, syncUrl: created.syncUrl, label: created.workspaceId, keyhive: created.keyhive }
       saveActiveWorkspace(active)
       setActiveWorkspace(active)
       appendLog('ok', 'Created workspace', `${created.workspaceId} · ${created.workspaceDocUrl}`)
@@ -115,6 +119,8 @@ export function HomePageContent() {
             workspaceDocUrl={activeWorkspace?.workspaceDocUrl}
             syncUrl={activeWorkspace?.syncUrl}
             joinUrl={joinUrl}
+            workspaceGroupId={workspaceState.doc?.keyhive?.workspaceGroupId ?? activeWorkspace?.keyhive?.workspaceGroupId}
+            workspaceDocumentId={workspaceState.doc?.keyhive?.workspaceDocumentId ?? activeWorkspace?.keyhive?.workspaceDocumentId}
             status={syncStatus}
             onCopy={copyWorkspaceValue}
             onResetLocal={activeWorkspace ? () => void resetLocalSession() : undefined}

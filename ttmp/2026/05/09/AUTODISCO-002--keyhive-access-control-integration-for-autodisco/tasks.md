@@ -14,14 +14,14 @@
 
 ### Phase K1: Mock ACL metadata in bootstrap
 
-- [ ] Add an ACL adapter factory in `packages/chat-acl`.
-- [ ] Inject `AccessControlAdapter` into server app/bootstrap dependencies.
-- [ ] Extend `createWorkspaceDoc` input to accept optional `keyhive` refs.
-- [ ] Call `acl.createWorkspace(name)` from `POST /api/bootstrap/workspaces`.
-- [ ] Store matching `WorkspaceDoc.keyhive` refs in the Automerge workspace doc.
-- [ ] Return `keyhive.workspaceGroupId` and `keyhive.workspaceDocumentId` in bootstrap response.
-- [ ] Update bootstrap and sync tests.
-- [ ] Display ACL refs in the web workspace card or debug panel.
+- [x] Add an ACL adapter factory in `packages/chat-acl`.
+- [x] Inject `AccessControlAdapter` into server app/bootstrap dependencies.
+- [x] Extend `createWorkspaceDoc` input to accept optional `keyhive` refs.
+- [x] Call `acl.createWorkspace(name)` from `POST /api/bootstrap/workspaces`.
+- [x] Store matching `WorkspaceDoc.keyhive` refs in the Automerge workspace doc.
+- [x] Return `keyhive.workspaceGroupId` and `keyhive.workspaceDocumentId` in bootstrap response.
+- [x] Update bootstrap and sync tests.
+- [x] Display ACL refs in the web workspace card or debug panel.
 
 ### Phase K2: Identity and contact-card UI
 

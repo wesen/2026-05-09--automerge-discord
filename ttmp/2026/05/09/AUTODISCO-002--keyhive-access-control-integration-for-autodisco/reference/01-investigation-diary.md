@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T14:35:00-04:00
+LastUpdated: 2026-05-09T14:18:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -463,3 +463,100 @@ remarquee upload bundle <ticket docs...> \
   --toc-depth 2 \
   --non-interactive
 ```
+
+## Step 6: Implement Phase K1 mock ACL metadata in bootstrap
+
+I implemented the first recommended Keyhive integration step from the design guide: workspace bootstrap now creates mock ACL metadata, stores it in the Automerge workspace document, returns it to the web client, and displays it in the workspace card. This does not add real Keyhive crypto yet; it establishes the API and document shape that real Keyhive will later satisfy.
+
+### Prompt Context
+
+**User prompt (verbatim):** "ok, add detailed tasks to the ticket, then work on them one by one, keeping a diary as you work, and committing at appropriate intervals."
+
+**Follow-up user prompt (verbatim):** "I expect you to be done when i come back."
+
+**Assistant interpretation:** Expand the ticket tasks and start implementing them in focused increments, updating the diary and committing coherent milestones.
+
+**Inferred user intent:** The user wants the Keyhive plan to move from design into implementation with traceable progress and reviewable commits.
+
+### What I did
+
+- Added a `createAccessControlAdapter()` factory to `packages/chat-acl` with `mock` as the implemented mode and `keyhive-experimental` as an explicit future mode.
+- Extended `createWorkspaceDoc()` to accept optional `keyhive` refs.
+- Avoided inserting `undefined` into Automerge documents by only setting `doc.keyhive` when input refs are present.
+- Injected an `AccessControlAdapter` dependency into `createChatServer()` via optional dependencies.
+- Updated `createBootstrapRouter()` to receive the ACL adapter.
+- Changed `POST /api/bootstrap/workspaces` to call `acl.createWorkspace(name)` before creating the Automerge document.
+- Stored matching `WorkspaceDoc.keyhive` refs in the newly created workspace document.
+- Returned `keyhive` in the bootstrap JSON response.
+- Updated the bootstrap integration test to assert response metadata and stored document metadata.
+- Extended `WorkspaceCard` to display ACL group/document ids and copy ACL JSON.
+- Passed bootstrap/document ACL refs from `HomePage` into `WorkspaceCard`.
+- Marked Phase K1 tasks complete in the ticket task list.
+
+### Why
+
+This is the smallest useful Keyhive-shaped step. It makes AUTODISCO's workspace creation path produce the access-control references that the future identity/contact-card/invite flow can use, without blocking on real Keyhive WASM integration.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+The browser E2E sync test still passes, proving the new ACL metadata did not break live Automerge workspace creation or two-session message sync.
+
+### What didn't work
+
+The first test run failed in `chat-core` because `createWorkspaceDoc()` returned a `keyhive: undefined` property. Automerge rejects explicit `undefined` values when creating documents:
+
+```text
+RangeError: Cannot assign undefined value at /keyhive, You might consider setting the property's value to `null`, or using `delete` to remove it altogether.
+```
+
+I fixed this by constructing the workspace doc object first and assigning `doc.keyhive = input.keyhive` only when `input.keyhive` is present.
+
+TypeScript also rejected passing `config.publicKey` directly into `InMemoryAccessControlAdapter` because `Uint8Array<ArrayBufferLike>` was not assignable to the constructor's narrower inferred `Uint8Array<ArrayBuffer>` parameter. I fixed this by copying the optional public key with `new Uint8Array(config.publicKey)` before passing it to the adapter.
+
+### What I learned
+
+Automerge document constructors must be careful not to include optional properties with explicit `undefined` values. Optional values should either be omitted or represented with `null` when null is semantically meaningful.
+
+### What was tricky to build
+
+The current `WorkspaceDoc.keyhive` type is optional, so it was tempting to include `keyhive: input.keyhive` directly. That is valid TypeScript but invalid Automerge input when the value is undefined. The correct implementation is a conditional property assignment.
+
+### What warrants a second pair of eyes
+
+- Review whether mock ACL ids like `group:Intern Guild` and `doc:Intern Guild` are acceptable for the next step or should switch to stable opaque ids.
+- Review whether `createChatServer(config, deps)` is the preferred dependency-injection shape before more routers need ACL access.
+- Review the new `Copy ACL` affordance on `WorkspaceCard` and whether ACL refs should live in a separate debug panel later.
+
+### What should be done in the future
+
+Proceed to Phase K2: add local identity/contact-card UI and mock contact-card export/copy.
+
+### Code review instructions
+
+- Start with `packages/chat-acl/src/index.ts` for the adapter factory.
+- Review `packages/chat-core/src/workspace.ts` for optional Keyhive refs and the no-undefined pattern.
+- Review `packages/chat-server/src/http/bootstrap.ts` and `packages/chat-server/test/bootstrap.test.ts` for server behavior.
+- Review `WorkspaceCard` and `HomePage` for UI display of ACL refs.
+- Validate with the commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/workspace.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`

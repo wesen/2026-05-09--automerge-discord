@@ -35,6 +35,19 @@ export interface AccessControlAdapter {
   ingestMembershipEvents(events: Uint8Array[]): Promise<Uint8Array[]>
 }
 
+export interface AccessControlConfig {
+  mode: 'mock' | 'keyhive-experimental'
+  localMemberId?: string
+  publicKey?: Uint8Array
+}
+
+export function createAccessControlAdapter(config: AccessControlConfig = { mode: 'mock' }): AccessControlAdapter {
+  if (config.mode === 'mock') {
+    return new InMemoryAccessControlAdapter(config.localMemberId ?? 'server-admin', config.publicKey ? new Uint8Array(config.publicKey) : undefined)
+  }
+  throw new Error('keyhive-experimental ACL mode is not implemented yet')
+}
+
 export class ForbiddenError extends Error {
   constructor(message = 'forbidden') {
     super(message)
