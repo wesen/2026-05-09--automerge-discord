@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ChannelId, WorkspaceDoc } from '@autodisco/chat-core'
 import { ChannelSidebar } from '../ChannelSidebar/index.js'
 import { MessageTimeline } from '../MessageTimeline/index.js'
@@ -15,6 +15,9 @@ export interface ChatShellProps {
 export function ChatShell({ workspace, localMemberId, syncStatus = 'idle', onSendMessage }: ChatShellProps) {
   const firstChannel = Object.keys(workspace.channels)[0] as ChannelId | undefined
   const [activeChannelId, setActiveChannelId] = useState<ChannelId | undefined>(firstChannel)
+  useEffect(() => {
+    if (!activeChannelId || !workspace.channels[activeChannelId]) setActiveChannelId(firstChannel)
+  }, [activeChannelId, firstChannel, workspace.channels])
   const activeChannel = activeChannelId ? workspace.channels[activeChannelId] : undefined
 
   return (
@@ -29,7 +32,7 @@ export function ChatShell({ workspace, localMemberId, syncStatus = 'idle', onSen
           <StatusPill tone={syncStatus}>{syncStatus === 'ok' ? 'synced' : syncStatus}</StatusPill>
         </header>
         {activeChannelId ? <MessageTimeline workspace={workspace} channelId={activeChannelId} localMemberId={localMemberId} /> : <p data-part="empty-state">No channels.</p>}
-        <Composer disabled={!activeChannelId} onSend={(body) => activeChannelId && onSendMessage?.(activeChannelId, body)} />
+        <Composer disabled={!activeChannelId || !onSendMessage} onSend={(body) => activeChannelId && onSendMessage?.(activeChannelId, body)} />
       </section>
     </main>
   )

@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:30:00-04:00
+LastUpdated: 2026-05-09T13:40:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -1201,3 +1201,107 @@ The lifecycle ordering matters: close client Repos before closing the server, cl
 Primary file changed:
 
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`
+
+
+## Step 14: Wire the browser UI to live Automerge DocHandles
+
+I replaced the chat UI's fixture-only behavior with a live browser Automerge Repo path. The web app can now create or open a workspace document, load it through Automerge Repo over the relay, initialize a local member/channel if needed, and send messages through `DocHandle.change`.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue"
+
+**Assistant interpretation:** Continue from the relay validation work into the next normal implementation step: make the browser client a real Automerge peer instead of only showing fixture chat data.
+
+**Inferred user intent:** The user wants the prototype to become actually distributed in the UI, not only in Node tests.
+
+### What I did
+
+- Added `@automerge/automerge-repo-storage-indexeddb` for browser-local Automerge storage.
+- Added `vite-plugin-wasm` because the browser build now imports Automerge's WASM bundle.
+- Added `packages/chat-web/src/features/automerge/repo.ts` to create/reuse browser Repos with:
+  - `WebSocketClientAdapter`
+  - `IndexedDBStorageAdapter`
+  - stable per-tab/session peer IDs
+- Added `packages/chat-web/src/features/automerge/identity.ts` for local member identity persisted in localStorage.
+- Added `packages/chat-web/src/features/automerge/useWorkspaceDoc.ts` with hooks to:
+  - load a workspace `automerge:...` URL,
+  - subscribe to `DocHandle` change events,
+  - ensure local membership plus a default `general` channel,
+  - send messages via `DocHandle.change`.
+- Added `OpenWorkspaceForm` so a second browser session can paste/open an existing Automerge URL and sync URL.
+- Reworked `HomePage` so bootstrap creates and immediately opens the real document, while the chat shell uses fixture data only as the idle/no-workspace fallback.
+- Updated `ChatShell` so the composer is enabled only when a live send handler exists and so active channel selection repairs itself when live channel data appears.
+
+### Why
+
+The previous UI milestone proved styling and bootstrap, but it did not prove live browser collaboration. This step makes the browser a true Automerge peer and connects message sending to the same relay/document model covered by the Node integration tests.
+
+### What worked
+
+Validation passed through devctl's dynamic check command:
+
+```bash
+devctl check --timeout 300s
+```
+
+This ran typecheck, production build, tests, and Storybook build successfully.
+
+Manual browser smoke validation also worked with devctl services running:
+
+```bash
+devctl up --force --timeout 60s
+# opened http://127.0.0.1:5174
+```
+
+In Playwright I created a workspace, sent `hello from live automerge`, opened a second isolated browser context with the same stored workspace metadata, verified the first message appeared there, sent `hello back from second context`, and verified it appeared back in the first context. That proves the browser UI is now using live Automerge sync rather than local fixtures for active workspaces.
+
+### What didn't work
+
+The first production build after importing Automerge Repo into the browser failed because Vite/Rolldown could not load Automerge's WASM file:
+
+```text
+[UNLOADABLE_DEPENDENCY] Could not load .../automerge_wasm_bg.wasm
+```
+
+I fixed this by adding `vite-plugin-wasm` and registering `wasm()` before the React plugin in `packages/chat-web/vite.config.ts`.
+
+### What I learned
+
+Once Automerge is imported into the browser bundle, WASM handling is a first-class build concern. The bundle now includes the Automerge WASM asset, which is expected and visible in Vite/Storybook build output.
+
+### What was tricky to build
+
+The app now has two sync URL shapes: bootstrap returns the relay's direct URL (`ws://localhost:3030/sync`), while the open form defaults to the current Vite origin (`ws://127.0.0.1:5174/sync`) so Vite can proxy `/sync`. Both worked during local development, but this should be made clearer in future UI copy.
+
+### What warrants a second pair of eyes
+
+- Review whether identity should remain localStorage-only or become part of an invite/member flow.
+- Review default channel creation policy. Currently the first browser peer initializes `general` when a blank workspace is opened.
+- Review whether browser Repos should be explicitly shut down/recreated when changing sync URLs.
+- Review bundle size impact of Automerge WASM and whether lazy-loading the live Automerge feature would help.
+
+### What should be done in the future
+
+- Promote the manual two-context Playwright smoke into an automated test.
+- Add offline/reconnect browser testing using separate browser contexts and IndexedDB state.
+- Improve the join/open flow so users can copy the workspace URL directly from the card.
+- Add a small debug strip showing peer id, doc URL, sync URL, and connection state.
+
+### Code review instructions
+
+- Start with `packages/chat-web/src/features/automerge/repo.ts`, `identity.ts`, and `useWorkspaceDoc.ts`.
+- Review `packages/chat-web/src/pages/HomePage/HomePage.tsx` for create/open/live-doc flow.
+- Review `OpenWorkspaceForm` for the manual join path.
+- Validate with `npm run typecheck`, `npm run build`, `npm test`, `npm --workspace @autodisco/chat-web run build-storybook`, or simply `devctl check --timeout 300s`.
+
+### Technical details
+
+Primary files added or changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/repo.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/identity.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/useWorkspaceDoc.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/vite.config.ts`

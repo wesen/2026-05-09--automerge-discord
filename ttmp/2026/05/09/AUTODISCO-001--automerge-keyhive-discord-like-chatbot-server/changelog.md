@@ -72,3 +72,13 @@ Extended relay integration coverage with a persistence/restart test: a message w
 ### Related Files
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — relay sync and persistence integration tests
+
+## 2026-05-09
+
+Wired the browser chat UI to live Automerge Repo/DocHandle state with IndexedDB storage, WebSocket sync, local identity, workspace open/join form, and live message sending. Verified two isolated browser contexts exchange messages through the relay.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge — browser Repo, identity, and live workspace hooks
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm — manual existing-workspace join form
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — live workspace create/open flow

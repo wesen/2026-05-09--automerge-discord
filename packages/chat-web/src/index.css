@@ -73,7 +73,8 @@ button, input { font: inherit; }
 
 :where([data-widget="autodisco"])[data-part="app-page"] { min-height: 100vh; display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: var(--mac-space-4); padding: var(--mac-space-4); background: radial-gradient(#9c9c9c 1px, transparent 1px), var(--mac-bg); background-size: 4px 4px; font-size: var(--mac-font-size); line-height: var(--mac-line-height); }
 :where([data-widget="autodisco"]) [data-part="hero-panel"] { min-width: 0; }
-:where([data-widget="autodisco"]) [data-part="bootstrap-form"] { display: grid; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="bootstrap-form"],
+:where([data-widget="autodisco"]) [data-part="open-workspace-form"] { display: grid; gap: var(--mac-space-3); }
 :where([data-widget="autodisco"]) [data-part="workspace-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
 :where([data-widget="autodisco"]) [data-part="workspace-card"] > div { display: flex; align-items: center; justify-content: space-between; gap: var(--mac-space-3); }
 :where([data-widget="autodisco"]) [data-part="workspace-card"] h3 { margin: 0; }

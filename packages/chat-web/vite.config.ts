@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import wasm from 'vite-plugin-wasm'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [wasm(), react()],
   server: {
     host: '127.0.0.1',
     port: Number(process.env.VITE_DEV_PORT ?? 5174),

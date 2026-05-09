@@ -60,8 +60,9 @@
 - [x] Add a two-peer Automerge Repo integration test through the relay.
 - [x] Add a persistence/restart sync test using the server storage adapter.
 - [ ] Add an offline/reconnect convergence test with client-side storage.
-- [ ] Add browser Automerge Repo/DocHandle wiring so the web UI uses live distributed state instead of fixtures.
-- [ ] Add Playwright two-context sync tests after live browser Automerge wiring.
+- [x] Add browser Automerge Repo/DocHandle wiring so the web UI uses live distributed state instead of fixtures.
+- [x] Manually verify two isolated browser contexts sync live messages through the relay.
+- [ ] Promote manual two-context Playwright browser sync smoke into an automated test.
 
 ### Phase 4: Keyhive integration spike
 
