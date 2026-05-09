@@ -6,12 +6,13 @@ import { store } from '../../app/store.js'
 import { fixtureIds, fixtureWorkspace } from '../../shared/fixtures.js'
 import { MacPanel } from '../../components/atoms/MacPanel/index.js'
 import { BootstrapWorkspaceForm } from '../../components/molecules/BootstrapWorkspaceForm/index.js'
+import { IdentityCard } from '../../components/molecules/IdentityCard/index.js'
 import { OpenWorkspaceForm, type OpenWorkspaceFormValue } from '../../components/molecules/OpenWorkspaceForm/index.js'
 import { WorkspaceCard, type WorkspaceCopyKind } from '../../components/molecules/WorkspaceCard/index.js'
 import { ChatShell } from '../../components/organisms/ChatShell/index.js'
 import { LogPane, type LogEntry, type LogLevel } from '../../components/organisms/LogPane/index.js'
 import { deriveDefaultSyncUrl, resetBrowserRepoStorage } from '../../features/automerge/repo.js'
-import { getLocalIdentity } from '../../features/automerge/identity.js'
+import { getLocalIdentity, stringifyContactCard } from '../../features/automerge/identity.js'
 import { useEnsureWorkspaceReady, useWorkspaceActions, useWorkspaceDoc } from '../../features/automerge/useWorkspaceDoc.js'
 
 interface ActiveWorkspace {
@@ -83,6 +84,16 @@ export function HomePageContent() {
     actions.send(channelId, body)
   }
 
+  async function copyContactCard() {
+    try {
+      const contactCard = stringifyContactCard(identity)
+      await copyToClipboard(contactCard)
+      appendLog('ok', 'Copied mock contact card', identity.memberId)
+    } catch (error) {
+      appendLog('error', 'Could not copy contact card', error instanceof Error ? error.message : String(error))
+    }
+  }
+
   async function copyWorkspaceValue(kind: WorkspaceCopyKind, value: string) {
     try {
       await copyToClipboard(value)
@@ -99,6 +110,7 @@ export function HomePageContent() {
       localStorage.removeItem('autodisco.activeWorkspace')
       localStorage.removeItem('autodisco.memberId')
       localStorage.removeItem('autodisco.displayName')
+      localStorage.removeItem('autodisco.publicKey')
       sessionStorage.removeItem('autodisco.peerId')
       setActiveWorkspace(undefined)
       if (typeof window !== 'undefined') window.location.replace(`${window.location.origin}${window.location.pathname}`)
@@ -112,6 +124,13 @@ export function HomePageContent() {
       <section data-part="hero-panel">
         <MacPanel title="AUTODISCO">
           <p>Local-first Discord-like chatbot prototype. Monochrome, CRDT-backed, and ready for Keyhive access-control experiments.</p>
+          <IdentityCard
+            displayName={identity.displayName}
+            memberId={identity.memberId}
+            publicKeyFingerprint={identity.publicKeyFingerprint}
+            mode="mock"
+            onCopyContactCard={() => void copyContactCard()}
+          />
           <BootstrapWorkspaceForm isLoading={result.isLoading} error={error} onCreate={(name) => void createAndOpenWorkspace(name)} />
           <OpenWorkspaceForm defaultSyncUrl={defaultSyncUrl} onOpen={openWorkspace} />
           <WorkspaceCard

@@ -28,3 +28,13 @@ Implemented Phase K1 mock ACL metadata wiring: workspace bootstrap now creates m
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — bootstrap ACL metadata creation and response
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — bootstrap metadata assertions
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx — ACL ref display/copy UI
+
+## 2026-05-09
+
+Implemented Phase K2 mock identity/contact-card UI: browser identities now include a persisted mock public key/fingerprint, the app renders an identity card, and users can copy a product-shaped mock contact card with debug-log feedback.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/identity.ts — mock identity and contact-card helpers
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/IdentityCard — identity/contact-card UI and stories
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — identity card rendering and contact-card copy logging

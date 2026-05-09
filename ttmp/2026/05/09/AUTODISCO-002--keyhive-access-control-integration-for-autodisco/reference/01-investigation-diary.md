@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T14:18:00-04:00
+LastUpdated: 2026-05-09T14:25:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -560,3 +560,82 @@ Primary files changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+
+## Step 7: Implement Phase K2 mock identity and contact-card UI
+
+I implemented the next Keyhive-shaped UI step: the browser now displays a mock access identity, generates a mock public key, can copy a product-shaped contact card, and logs the contact-card action. This is still mock mode, but it prepares the UI and data shape for real Keyhive contact cards.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue working through the Keyhive ticket backlog one phase at a time, committing focused milestones.
+
+**Inferred user intent:** The user expects visible implementation progress on the detailed Keyhive plan, with the diary kept current.
+
+### What I did
+
+- Extended `LocalIdentity` with a base64 mock public key and short public-key fingerprint.
+- Persisted the mock public key in localStorage as `autodisco.publicKey`.
+- Added `AutodiscoContactCardV1` and helpers to create/stringify mock contact cards.
+- Added `IdentityCard` molecule with Storybook stories.
+- Rendered `IdentityCard` in `HomePage` above workspace creation/opening controls.
+- Added `Copy Contact Card` behavior that writes formatted JSON to the clipboard and records a debug-log entry.
+- Updated reset-local-session behavior to clear `autodisco.publicKey`.
+- Added CSS coverage for the identity card using the same Mac OS 1 part/token contract as the workspace card.
+- Marked Phase K2 tasks complete.
+
+### Why
+
+Keyhive invitation flows begin with identity exchange. Even before real Keyhive WASM is wired, AUTODISCO needs a stable UI concept for “my local identity” and “my contact card.” This lets the invite UI be built and tested against mock data first.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+The existing two-browser sync E2E test still passes.
+
+### What didn't work
+
+No blocking implementation failures occurred in this step.
+
+### What I learned
+
+The existing local identity file was a natural place for mock contact-card helpers because the browser already has stable per-user/member state there. Real Keyhive mode can later replace the mock public key/contact card generation behind a similar facade.
+
+### What was tricky to build
+
+The contact card is deliberately product-shaped but not Keyhive-compatible yet. It includes `kind`, `mode`, `displayName`, `agent`, `publicKey`, and `createdAt`, which is enough for mock invitation flows while leaving room for real Keyhive card JSON later.
+
+### What warrants a second pair of eyes
+
+- Review whether the mock contact-card shape should exactly match future server invite API expectations.
+- Review whether identity belongs in the left panel permanently or should move into a collapsible/debug section.
+
+### What should be done in the future
+
+Proceed to Phase K3: add server invitation endpoints and a web invite form that can paste the mock contact card JSON.
+
+### Code review instructions
+
+- Review `packages/chat-web/src/features/automerge/identity.ts` for mock identity/contact-card shape.
+- Review `packages/chat-web/src/components/molecules/IdentityCard` for UI/stories.
+- Review `HomePage` for copy/log/reset integration.
+- Validate with the commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/identity.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/IdentityCard/IdentityCard.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/IdentityCard/IdentityCard.stories.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/index.css`

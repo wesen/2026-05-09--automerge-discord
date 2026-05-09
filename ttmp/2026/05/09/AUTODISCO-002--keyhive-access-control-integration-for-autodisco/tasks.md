@@ -25,10 +25,10 @@
 
 ### Phase K2: Identity and contact-card UI
 
-- [ ] Add `IdentityCard` component and Storybook stories.
-- [ ] Add mock contact-card JSON export/copy.
-- [ ] Add debug-log entries for identity/contact-card actions.
-- [ ] Add local reset coverage for access identity state.
+- [x] Add `IdentityCard` component and Storybook stories.
+- [x] Add mock contact-card JSON export/copy.
+- [x] Add debug-log entries for identity/contact-card actions.
+- [x] Add local reset coverage for access identity state.
 
 ### Phase K3: Invitation API and UI
 

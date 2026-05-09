@@ -50,7 +50,8 @@ button, input { font: inherit; }
 :where([data-widget="autodisco"]) [data-part="mac-button"]:disabled { color: var(--mac-muted); cursor: not-allowed; }
 
 :where([data-widget="autodisco"]) [data-part="mac-panel"],
-:where([data-widget="autodisco"]) [data-part="workspace-card"] {
+:where([data-widget="autodisco"]) [data-part="workspace-card"],
+:where([data-widget="autodisco"]) [data-part="identity-card"] {
   border: 2px solid var(--mac-border-dark);
   background: var(--mac-surface);
   box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid);
@@ -75,12 +76,18 @@ button, input { font: inherit; }
 :where([data-widget="autodisco"]) [data-part="hero-panel"] { min-width: 0; }
 :where([data-widget="autodisco"]) [data-part="bootstrap-form"],
 :where([data-widget="autodisco"]) [data-part="open-workspace-form"] { display: grid; gap: var(--mac-space-3); }
-:where([data-widget="autodisco"]) [data-part="workspace-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
-:where([data-widget="autodisco"]) [data-part="workspace-card-header"] { display: flex; align-items: center; justify-content: space-between; gap: var(--mac-space-3); }
-:where([data-widget="autodisco"]) [data-part="workspace-card"] h3 { margin: 0; }
-:where([data-widget="autodisco"]) [data-part="workspace-card"] dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--mac-space-1) var(--mac-space-2); margin: 0; }
-:where([data-widget="autodisco"]) [data-part="workspace-card"] dd { margin: 0; overflow-wrap: anywhere; color: var(--mac-muted); }
-:where([data-widget="autodisco"]) [data-part="workspace-actions"] { display: flex; flex-wrap: wrap; gap: var(--mac-space-2); }
+:where([data-widget="autodisco"]) [data-part="workspace-card"],
+:where([data-widget="autodisco"]) [data-part="identity-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
+:where([data-widget="autodisco"]) [data-part="workspace-card-header"],
+:where([data-widget="autodisco"]) [data-part="identity-card-header"] { display: flex; align-items: center; justify-content: space-between; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] h3,
+:where([data-widget="autodisco"]) [data-part="identity-card"] h3 { margin: 0; }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] dl,
+:where([data-widget="autodisco"]) [data-part="identity-card"] dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--mac-space-1) var(--mac-space-2); margin: 0; }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] dd,
+:where([data-widget="autodisco"]) [data-part="identity-card"] dd { margin: 0; overflow-wrap: anywhere; color: var(--mac-muted); }
+:where([data-widget="autodisco"]) [data-part="workspace-actions"],
+:where([data-widget="autodisco"]) [data-part="identity-actions"] { display: flex; flex-wrap: wrap; gap: var(--mac-space-2); }
 :where([data-widget="autodisco"]) [data-part="work-area"] { min-width: 0; min-height: calc(100vh - 2rem); display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--mac-space-3); }
 
 :where([data-widget="autodisco"])[data-part="chat-shell"] { min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 2px solid var(--mac-border-dark); background: var(--mac-surface); box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid); }
