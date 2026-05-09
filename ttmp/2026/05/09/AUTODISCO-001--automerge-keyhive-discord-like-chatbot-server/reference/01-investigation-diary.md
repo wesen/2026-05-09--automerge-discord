@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:15:00-04:00
+LastUpdated: 2026-05-09T13:25:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -1022,3 +1022,97 @@ Primary files added or changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/package.json`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/package-lock.json`
+
+
+## Step 12: Add a real two-peer Automerge relay integration test
+
+After the web-client checkpoint, I added the first automated proof that the relay can synchronize one Automerge workspace document across two independent Repo clients. This addresses the question of whether the prototype is using Automerge for real beyond the fixture UI.
+
+### Prompt Context
+
+**User prompt (verbatim):** "is this alraedy using automerge for real? how can we best test multiple sessions to see that it really works distributed?"
+
+**Follow-up prompt:** "ok anyway, continue committing and updating your diary, then continue as you would normally have."
+
+**Assistant interpretation:** First commit the web-client milestone and update the diary, then continue with the next most valuable validation: a real multi-peer Automerge sync test through the relay.
+
+**Inferred user intent:** The user wants confidence that the architecture is truly distributed/local-first and not just a REST-backed UI mock.
+
+### What I did
+
+- Committed the web-client/devctl milestone as `ebf94db` with message `Add AUTODISCO web client`.
+- Added `packages/chat-server/test/sync.test.ts`.
+- The new test starts a real chat server with a temporary Automerge data directory.
+- It bootstraps a workspace through the real HTTP API.
+- It creates two independent Automerge Repo clients, Alice and Bob, each with its own `WebSocketClientAdapter` connected to the server `/sync` endpoint.
+- Alice loads the returned `automerge:...` URL, adds both members, and creates a `general` channel through the normal chat-core mutation helpers.
+- Bob loads the same Automerge URL and waits until that setup state syncs to his handle.
+- Alice and Bob then make separate message edits on their own handles.
+- The test waits until both handles converge and contain both message bodies.
+
+### Why
+
+The UI still renders fixture chat data, so browser-only manual testing would not prove distributed Automerge behavior yet. A Node integration test with two independent Repo clients is the cleanest proof that the server relay, document bootstrap URL, WebSocket sync path, and mutation model work together.
+
+### What worked
+
+The chat-server test suite passed:
+
+```bash
+npm --workspace @autodisco/chat-server test
+```
+
+Full typecheck and tests also passed:
+
+```bash
+npm run typecheck
+npm test
+```
+
+### What didn't work
+
+I first tried to run Vitest with a Jest-style option:
+
+```bash
+npm --workspace @autodisco/chat-server test -- --runInBand
+```
+
+Vitest rejected it with:
+
+```text
+CACError: Unknown option `--runInBand`
+```
+
+I reran the package test without that option, and it passed.
+
+### What I learned
+
+The server's current `sharePolicy: async () => false` does not prevent a client that already knows the Automerge URL from loading and syncing the document, because the legacy `sharePolicy` path configures access as allowed while announcement remains denied. That is acceptable for the current bootstrap-url prototype, but the access/announcement distinction should be revisited when real Keyhive admission is added.
+
+### What was tricky to build
+
+The bootstrap endpoint returns a sync URL based on `publicBaseUrl`. In tests the server listens on port `0`, so I mutate the config's `publicBaseUrl` after the actual port is known and before calling bootstrap. Because the router closes over the config object, the response contains the correct test sync URL.
+
+### What warrants a second pair of eyes
+
+- Review the test's reliance on URL-known access while `announce` is false.
+- Decide whether relay tests should use a deterministic port helper or keep the current `port: 0` pattern.
+- Add stronger tests for persistence/restart and offline/reconnect next.
+
+### What should be done in the future
+
+- Add a persistence/restart test with a fresh third client.
+- Add an offline/reconnect convergence test with client-side storage.
+- Wire the browser UI to a live Automerge Repo and reuse the same synchronization expectations in Playwright.
+
+### Code review instructions
+
+- Start with `packages/chat-server/test/sync.test.ts`.
+- Confirm it does not call a REST message endpoint; all chat changes after bootstrap happen through `DocHandle.change`.
+- Validate with `npm --workspace @autodisco/chat-server test`, then `npm run typecheck && npm test`.
+
+### Technical details
+
+Primary file added:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`

@@ -56,3 +56,11 @@ Added the first AUTODISCO web client package with React, Vite, Tailwind, RTK Que
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web — React/Vite/Storybook web package
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — devctl launch plan now includes chat-server, web, and Storybook
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — updated development profile description
+
+## 2026-05-09
+
+Added a real multi-peer Automerge relay integration test that starts the server, bootstraps a workspace, connects two independent Repo clients over WebSocket sync, applies separate message edits, and asserts convergence on both clients.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — two-peer Automerge relay sync test
