@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T17:02:00-04:00
+LastUpdated: 2026-05-09T17:12:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1392,3 +1392,9 @@ npm run typecheck
 npm --workspace @autodisco/chat-server test
 npm --workspace @autodisco/chat-web run build-storybook
 ```
+
+## Step 20: Onboarding README and updated Keyhive project report
+
+I added a top-level README for AUTODISCO so someone can start the app without reading the full ticket history first. The README explains what the app is, what works today, how to run the default and Keyhive devctl profiles, how to test chat, how to use contact cards and invitations, the important API endpoints, and where the deeper design docs live.
+
+I also updated the Obsidian project report `PROJ - AUTODISCO - Keyhive Access Control Architecture.md` to reflect the current implementation state after durable Keyhive snapshots, the patched local Keyhive package, the runtime status UI, wrapped contact cards, and invitation acceptance plumbing. The updated vault report was copied back into the AUTODISCO-002 `project-reports/` directory so the ticket-local report stays in sync.

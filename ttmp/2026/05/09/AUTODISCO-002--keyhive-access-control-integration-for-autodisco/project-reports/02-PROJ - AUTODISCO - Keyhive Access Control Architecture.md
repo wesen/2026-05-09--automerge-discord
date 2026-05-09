@@ -30,13 +30,13 @@ RelatedFiles:
   - Path: packages/chat-acl/test/keyhive-adapter.test.ts
     Note: Experimental Keyhive adapter tests.
   - Path: packages/chat-server/src/http/bootstrap.ts
-    Note: Workspace bootstrap, invitation, revoke, and accept-placeholder endpoints.
+    Note: Workspace bootstrap, runtime ACL status, invitation create/accept/revoke endpoints.
   - Path: packages/chat-server/src/config.ts
     Note: ACL_MODE mock vs keyhive-experimental configuration.
   - Path: packages/chat-web/src/features/automerge/identity.ts
-    Note: Browser mock identity and contact-card helpers.
+    Note: Browser mock identity and contact-card helpers used by the default profile.
   - Path: packages/chat-web/src/components/molecules/IdentityCard/IdentityCard.tsx
-    Note: Local identity display and contact-card copy UI.
+    Note: Runtime ACL identity display and contact-card copy UI.
   - Path: packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx
     Note: Contact-card paste and invite creation UI.
   - Path: ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/scripts/02-keyhive-node-spike-stable.mjs
@@ -50,7 +50,71 @@ RelatedFiles:
 AUTODISCO's Keyhive work adds an access-control layer to an already working Automerge chat prototype. The Automerge system can create workspace documents, replicate them through a WebSocket relay, persist them on the server, persist them in the browser, and merge concurrent or offline edits. That solves collaboration. It does not solve authorization. Keyhive is the intended direction for identity, invitation, delegation, revocation, membership-event synchronization, and eventually encrypted document access.
 
 > [!summary]
-> The Keyhive implementation is intentionally staged. The stable default is a mock access-control product flow that gives the app identity cards, contact cards, invitations, workspace ACL metadata, admin checks, and permission-denied feedback. The experimental path uses real `@keyhive/keyhive` WASM for identities, groups, documents, delegation, revocation, archive export, and membership events. Content encryption is not yet proven because `tryEncrypt` currently fails in the Node spike with a low-level WASM `null pointer passed to rust` error.
+> The Keyhive implementation is intentionally staged. The stable default is a mock access-control product flow that gives the app identity cards, contact cards, invitations, workspace ACL metadata, admin checks, and permission-denied feedback. The experimental path now uses a locally patched Keyhive WASM package for real identities, groups, documents, delegation, revocation, archive persistence, membership-event export/ingest, and adapter-level encrypt/decrypt coverage. The app has a dedicated `keyhive` devctl profile, runtime ACL-status UI, AUTODISCO-wrapped Keyhive contact cards, and an invitation acceptance form that ingests membership events into the active ACL adapter.
+
+## 2026-05-09 implementation update: durable Keyhive mode and invitation acceptance
+
+The earlier version of this report described the Keyhive path as a limited experiment blocked by `tryEncrypt` and lacking durable reload. That is no longer the current state of the repository. AUTODISCO now has a dedicated experimental Keyhive runtime mode, a local patched Keyhive WASM package, durable adapter snapshotting, and a visible create/accept invitation loop.
+
+The default `development` devctl profile still runs the stable mock ACL flow. The new `keyhive` profile runs the same app with:
+
+```bash
+devctl up --profile keyhive --force --timeout 60s
+```
+
+That profile sets:
+
+```text
+ACL_MODE=keyhive-experimental
+DATA_DIR=.devctl/data/autodisco-keyhive
+```
+
+The durable Keyhive state is written to:
+
+```text
+.devctl/data/autodisco-keyhive/keyhive-acl-snapshot.json
+```
+
+The snapshot contains JSON-safe signing key bytes, archive bytes, prekey secret bytes, known document ids, known agent ids, and admin target ids. On restart, the server restores the memory signer with `Signer.memorySignerFromBytes(...)`, reconstructs Keyhive from `Archive.tryToKeyhive(...)`, imports prekey secrets, and rehydrates known document/agent handles with `getDocument(...)` and `getAgent(...)`. This gives the prototype durable document-level Keyhive behavior across server restarts.
+
+The `tryEncrypt` issue was isolated in AUTODISCO-003 as a WASM binding ownership bug. The local fix changes the Rust `try_encrypt` binding to borrow `&JsDocument` and `&JsChangeId` and duplicate the underlying document handle before calling core encryption. AUTODISCO currently consumes the rebuilt local package from:
+
+```text
+vendor/keyhive-src/keyhive_wasm/pkg-node-patched
+```
+
+That is why the repository can now prove Keyhive encrypt/decrypt in `packages/chat-acl/test/keyhive-spike.test.ts` and through adapter helpers in `packages/chat-acl/test/keyhive-adapter.test.ts`. This is still not a production dependency strategy. The correct long-term path is to upstream the fix and return to an upstream-published `@keyhive/keyhive` package.
+
+The web UI also changed. The top-left identity card now queries `GET /api/bootstrap/status`, shows the runtime ACL mode, and copies a profile-appropriate contact card. In Keyhive mode, the copied card is an AUTODISCO envelope around the opaque raw Keyhive contact-card payload:
+
+```json
+{
+  "kind": "autodisco.contact-card.v1",
+  "mode": "keyhive-experimental",
+  "agent": { "id": "keyhive:...", "kind": "individual" },
+  "publicKeyFingerprint": "...",
+  "keyhiveContactCardJson": "{... raw Keyhive Rotate payload ...}"
+}
+```
+
+The invitation UI now supports the full visible loop:
+
+1. copy a contact card;
+2. paste it into `Peer contact card JSON`;
+3. choose access;
+4. create an `autodisco.invitation.v1`;
+5. copy/prefill the invitation;
+6. accept the invitation by decoding and ingesting its membership events.
+
+The accept endpoint is:
+
+```text
+POST /api/bootstrap/invitations/accept
+```
+
+It accepts either the invitation object directly or `{ "invitation": ... }`, decodes `membershipEvents` from base64, and calls `acl.ingestMembershipEvents(...)`. In Keyhive mode, that path invokes real Keyhive event ingestion.
+
+The important limitation remains: acceptance currently ingests into the same running backend adapter. It proves that invitation payloads are structurally useful and that membership events can be ingested, but it is not yet a full peer-to-peer product flow where a separate browser-native identity receives and stores its own Keyhive membership. The next validation step should be either browser-native Keyhive identity or a second devctl peer profile on a separate port and data directory.
 
 ## Why this project needs Keyhive
 

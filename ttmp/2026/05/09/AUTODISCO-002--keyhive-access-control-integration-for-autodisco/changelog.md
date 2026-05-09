@@ -167,3 +167,13 @@ Added invitation acceptance plumbing. The backend now implements `POST /api/boot
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts — accept mutation
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/AcceptInvitationForm/AcceptInvitationForm.tsx — accept invitation UI
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — create/accept invitation flow wiring
+
+## 2026-05-09
+
+Added a top-level AUTODISCO README with setup instructions, devctl profiles, chat walkthrough, Keyhive invite/contact-card workflow, API quick reference, architecture diagram, known limitations, and links to the relevant ticket docs. Updated the Obsidian Keyhive project report and copied the refreshed report back into the AUTODISCO-002 ticket project reports.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/README.md — project onboarding and getting-started guide
+- /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md — updated vault project report
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md — ticket-local copy of the updated report
