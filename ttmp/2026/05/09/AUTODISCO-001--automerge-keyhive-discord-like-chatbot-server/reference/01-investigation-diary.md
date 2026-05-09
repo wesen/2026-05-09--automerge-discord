@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:40:00-04:00
+LastUpdated: 2026-05-09T13:47:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -896,6 +896,7 @@ Primary files:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.gitignore`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
 
 
 ## Step 11: Add the React/Vite/Storybook web client and devctl frontend services
@@ -1305,3 +1306,88 @@ Primary files added or changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/vite.config.ts`
+
+
+## Step 15: Promote browser two-context sync to Playwright automation
+
+I turned the manual two-browser-context sync smoke into a checked-in Playwright test that can be run against the devctl-managed development services.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue"
+
+**Assistant interpretation:** Continue hardening the live browser Automerge path by automating the multi-session browser validation that was previously manual.
+
+**Inferred user intent:** The user wants durable confidence that the browser UI actually syncs between sessions, not just a one-off manual demo.
+
+### What I did
+
+- Installed `@playwright/test`.
+- Added `packages/chat-web/playwright.config.ts`.
+- Added `packages/chat-web/e2e/live-sync.spec.ts`.
+- Added package/root scripts:
+  - `npm --workspace @autodisco/chat-web run test:e2e`
+  - `npm run test:e2e:web`
+- Added a devctl dynamic command:
+  - `devctl test-web-sync --timeout 120s`
+- Added `.gitignore` entries for Playwright `test-results/` and `playwright-report/`.
+- The test uses two isolated browser contexts, creates a workspace in Alice, shares the stored workspace metadata with Bob, sends one message from Alice and one from Bob, and asserts each appears in the other session.
+
+### Why
+
+The Node integration tests prove Automerge Repo sync and persistence, but a browser E2E test proves the actual UI path: bootstrap, local identity, browser Repo, IndexedDB storage adapter, WebSocket sync, React handle subscription, composer, and timeline rendering.
+
+### What worked
+
+With devctl services already running, the E2E test passed directly and through devctl:
+
+```bash
+npm --workspace @autodisco/chat-web run test:e2e
+devctl test-web-sync --timeout 120s
+```
+
+I also reran the broader devctl check successfully:
+
+```bash
+devctl check --timeout 300s
+```
+
+### What didn't work
+
+No implementation failures in this step. One expected operational constraint is that the E2E test assumes the dev services are already running. It checks `http://127.0.0.1:3030/healthz` at the beginning and tells the reviewer to use devctl if the server is not up.
+
+### What I learned
+
+For this repo, keeping Vite and Storybook hot-reload services alive via devctl is more pleasant than having Playwright repeatedly start and stop them. The current E2E script is therefore an against-running-dev-env test rather than a fully self-starting CI test.
+
+### What was tricky to build
+
+The test should use isolated contexts, not two tabs in the same context, because the app persists identity/workspace data in browser storage. Isolated contexts better simulate two separate browser sessions/devices.
+
+### What warrants a second pair of eyes
+
+- Decide whether E2E should remain an against-devctl script or whether a CI-oriented Playwright config should start its own server and Vite processes.
+- Decide whether `devctl check` should include the E2E test or whether it should stay fast and non-browser.
+
+### What should be done in the future
+
+- Add an E2E test for opening a pasted Automerge URL through the visible form instead of directly setting localStorage.
+- Add offline/reconnect tests once the UI exposes connection state or a network toggle.
+- Add copy buttons for workspace and sync URLs to make manual multi-session testing easier.
+
+### Code review instructions
+
+- Review `packages/chat-web/e2e/live-sync.spec.ts` for the two-context workflow.
+- Run `devctl up --force --timeout 60s` if services are not already running.
+- Run `npm run test:e2e:web`.
+
+### Technical details
+
+Primary files added or changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/playwright.config.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/e2e/live-sync.spec.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/.gitignore`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`

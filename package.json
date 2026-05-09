@@ -12,7 +12,8 @@
     "typecheck": "tsc -b packages/chat-core packages/chat-acl packages/chat-client packages/chat-bot-worker packages/chat-server packages/chat-web --pretty false",
     "dev:server": "npm --workspace @autodisco/chat-server run dev",
     "dev:web": "npm --workspace @autodisco/chat-web run dev",
-    "storybook": "npm --workspace @autodisco/chat-web run storybook"
+    "storybook": "npm --workspace @autodisco/chat-web run storybook",
+    "test:e2e:web": "npm --workspace @autodisco/chat-web run test:e2e"
   },
   "dependencies": {
     "@automerge/automerge": "latest",
@@ -28,6 +29,7 @@
     "ws": "latest"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@storybook/react-vite": "^10.3.6",
     "@types/express": "latest",
     "@types/node": "latest",

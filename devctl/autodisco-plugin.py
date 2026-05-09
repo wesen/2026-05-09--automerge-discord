@@ -198,6 +198,11 @@ def handle_command_run(request_id: str, ctx: dict[str, Any], input_obj: dict[str
             response_ok(request_id, {"exit_code": 0})
             return
 
+        if name == "test-web-sync":
+            code = run_command(["npm", "--workspace", "@autodisco/chat-web", "run", "test:e2e"], root)
+            response_ok(request_id, {"exit_code": code})
+            return
+
         if name == "bootstrap-workspace":
             workspace_name = "Devctl Guild"
             argv = input_obj.get("argv")
@@ -229,6 +234,7 @@ emit({
         "ops": ["config.mutate", "validate.run", "launch.plan", "command.run"],
         "commands": [
             {"name": "check", "help": "Run typecheck, build, and tests for AUTODISCO"},
+            {"name": "test-web-sync", "help": "Run Playwright two-session browser sync test against the running dev services"},
             {"name": "bootstrap-workspace", "help": "Create a workspace against the running dev server; optional first arg is the workspace name"},
         ],
     },

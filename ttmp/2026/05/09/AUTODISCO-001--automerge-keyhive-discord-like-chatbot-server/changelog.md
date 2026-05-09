@@ -82,3 +82,14 @@ Wired the browser chat UI to live Automerge Repo/DocHandle state with IndexedDB 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge — browser Repo, identity, and live workspace hooks
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm — manual existing-workspace join form
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — live workspace create/open flow
+
+## 2026-05-09
+
+Added Playwright E2E coverage for live browser Automerge sync: two isolated browser contexts create/open the same workspace and exchange messages through the relay.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/e2e/live-sync.spec.ts — two-context browser sync E2E test
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/playwright.config.ts — Playwright configuration
+
+Added devctl dynamic command `test-web-sync` to run the Playwright two-session browser sync test against already-running development services.

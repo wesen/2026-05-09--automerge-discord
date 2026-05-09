@@ -4,6 +4,8 @@ node_modules/
 dist/
 build/
 storybook-static/
+test-results/
+playwright-report/
 coverage/
 .env
 .env.*
