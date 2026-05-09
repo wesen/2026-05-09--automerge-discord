@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T15:00:00-04:00
+LastUpdated: 2026-05-09T15:08:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1059,3 +1059,35 @@ Primary files changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`
+
+## Step 12: Write Obsidian project reports and copy them into the ticket
+
+The user requested two very detailed project reports written as technical blog posts in a textbook style: one for the AUTODISCO Automerge/chat app architecture and one for the AUTODISCO Keyhive access-control architecture. I wrote both as Obsidian project notes under the vault's dated project folder and then used `cp` to copy both into the AUTODISCO-002 ticket.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Ok anyway, let's write 2 documents: both are project reports for the obsidian vault, as deep dive technical blog posts, very very detailed, written in a textbook writing style (see skills, no analogies). One about the discord app and the automerge side of things, how it all works, what automoerge is, the webUI, the backend, all of that. The second one is the same, but about the keyhive part. Then copy both with `cp` into the ticket as well."
+
+**Assistant interpretation:** Create durable Obsidian project-report notes, not short summaries, and make ticket-local copies for traceability.
+
+### What I did
+
+- Read the Obsidian vault writing and textbook-authoring skills.
+- Used the vault project-note style with YAML frontmatter, a summary callout, concrete repo paths, implementation sections, Mermaid diagrams, failure modes, and next steps.
+- Wrote the Automerge/backend/web UI report to:
+  - `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Automerge Discord App Architecture.md`
+- Wrote the Keyhive/access-control report to:
+  - `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md`
+- Copied both files with `cp` into:
+  - `ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/`
+- Renamed the ticket-local copies with numeric prefixes so `docmgr doctor` would pass:
+  - `project-reports/01-PROJ - AUTODISCO - Automerge Discord App Architecture.md`
+  - `project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md`
+
+### Validation
+
+```bash
+docmgr doctor --ticket AUTODISCO-002 --stale-after 30
+```
+
+The doctor check passed after adding numeric prefixes to the ticket-local copies.

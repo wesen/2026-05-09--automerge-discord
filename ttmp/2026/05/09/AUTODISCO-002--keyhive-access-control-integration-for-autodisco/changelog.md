@@ -81,3 +81,14 @@ Implemented a limited `KeyhiveAccessControlAdapter` behind the ACL seam and adde
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts — experimental adapter tests
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/config.ts — `ACL_MODE` selection
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — adapter factory wiring
+
+## 2026-05-09
+
+Wrote two long-form Obsidian project reports and copied them into the ticket: one covering the Automerge/backend/React web UI architecture and one covering the Keyhive access-control architecture, mock flow, WASM spike, and experimental adapter.
+
+### Related Files
+
+- /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Automerge Discord App Architecture.md — Obsidian project report for the Automerge app architecture
+- /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md — Obsidian project report for the Keyhive architecture
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/01-PROJ - AUTODISCO - Automerge Discord App Architecture.md — ticket-local copy
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md — ticket-local copy
