@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { Repo, type PeerId } from '@automerge/automerge-repo'
+import { Repo, type DocHandle, type PeerId } from '@automerge/automerge-repo'
 import { WebSocketClientAdapter } from '@automerge/automerge-repo-network-websocket'
 import {
   addMember,
@@ -30,11 +30,7 @@ const runningRepos: Repo[] = []
 describe('Automerge relay sync', () => {
   afterEach(async () => {
     await Promise.allSettled(runningRepos.splice(0).map((repo) => repo.shutdown()))
-    await Promise.allSettled(runningServers.splice(0).map(async ({ chat, server, dataDir }) => {
-      chat.runtime.wss.close()
-      await new Promise<void>((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())))
-      await rm(dataDir, { recursive: true, force: true })
-    }))
+    await Promise.allSettled(runningServers.splice(0).map((started) => stopServer(started, { removeDataDir: true })))
   })
 
   it('syncs concurrent workspace edits across two independent repo clients', async () => {
@@ -47,57 +43,91 @@ describe('Automerge relay sync', () => {
     const bobRepo = createClientRepo('bob', started.syncUrl)
 
     const aliceHandle = await aliceRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
-    const channelId = newId('ch') as ChannelId
-    const aliceId = newId('mem') as MemberId
-    const bobId = newId('mem') as MemberId
-
-    aliceHandle.change((doc) => {
-      addMember(doc, { id: aliceId, displayName: 'Alice', joinedAt: '2026-05-09T17:00:00Z' })
-      addMember(doc, { id: bobId, displayName: 'Bob', joinedAt: '2026-05-09T17:00:01Z' })
-      createChannel(doc, {
-        id: channelId,
-        name: 'general',
-        kind: 'text',
-        categoryId: null,
-        createdBy: aliceId,
-        createdAt: '2026-05-09T17:00:02Z',
-      })
-    })
+    const { channelId, aliceId, bobId } = initializeWorkspace(aliceHandle)
 
     const bobHandle = await bobRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
     await waitForDoc(bobHandle, (doc) => Boolean(doc.channels[channelId] && doc.members[aliceId] && doc.members[bobId]))
 
-    aliceHandle.change((doc) => {
-      sendMessage(doc, {
-        id: newId('msg'),
-        channelId,
-        authorId: aliceId,
-        body: 'hello from alice',
-        createdAt: '2026-05-09T17:01:00Z',
-      })
-    })
-    bobHandle.change((doc) => {
-      sendMessage(doc, {
-        id: newId('msg'),
-        channelId,
-        authorId: bobId,
-        body: 'hello from bob',
-        createdAt: '2026-05-09T17:01:01Z',
-      })
-    })
+    sendChatMessage(aliceHandle, { channelId, authorId: aliceId, body: 'hello from alice', createdAt: '2026-05-09T17:01:00Z' })
+    sendChatMessage(bobHandle, { channelId, authorId: bobId, body: 'hello from bob', createdAt: '2026-05-09T17:01:01Z' })
 
     const expectedBodies = ['hello from alice', 'hello from bob']
     await waitForMessages(aliceHandle, channelId, expectedBodies)
     await waitForMessages(bobHandle, channelId, expectedBodies)
   }, 20_000)
+
+  it('persists synced workspace edits across relay restarts', async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), 'autodisco-sync-persist-test-'))
+    const firstServer = await startServer(dataDir)
+    const bootstrap = await bootstrapWorkspace(firstServer.baseUrl, 'Persistent Guild')
+    const aliceRepo = createClientRepo('alice-persist', firstServer.syncUrl)
+    const aliceHandle = await aliceRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+    const { channelId, aliceId } = initializeWorkspace(aliceHandle)
+    sendChatMessage(aliceHandle, {
+      channelId,
+      authorId: aliceId,
+      body: 'persist me through restart',
+      createdAt: '2026-05-09T17:02:00Z',
+    })
+
+    const serverHandle = await firstServer.chat.runtime.repo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+    await waitForMessages(serverHandle, channelId, ['persist me through restart'])
+    await firstServer.chat.runtime.repo.flush()
+    await aliceRepo.shutdown()
+    removeRunningRepo(aliceRepo)
+    await stopServer(firstServer, { removeDataDir: false })
+
+    const secondServer = await startServer(dataDir)
+    const restartedServerHandle = await secondServer.chat.runtime.repo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+    await waitForMessages(restartedServerHandle, channelId, ['persist me through restart'])
+
+    const charlieRepo = createClientRepo('charlie-persist', secondServer.syncUrl)
+    const charlieHandle = await charlieRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+
+    await waitForMessages(charlieHandle, channelId, ['persist me through restart'])
+  }, 20_000)
 })
 
-async function startServer(): Promise<StartedServer> {
-  const dataDir = await mkdtemp(join(tmpdir(), 'autodisco-sync-test-'))
+function initializeWorkspace(handle: DocHandle<WorkspaceDoc>): { channelId: ChannelId; aliceId: MemberId; bobId: MemberId } {
+  const channelId = newId('ch') as ChannelId
+  const aliceId = newId('mem') as MemberId
+  const bobId = newId('mem') as MemberId
+  handle.change((doc) => {
+    addMember(doc, { id: aliceId, displayName: 'Alice', joinedAt: '2026-05-09T17:00:00Z' })
+    addMember(doc, { id: bobId, displayName: 'Bob', joinedAt: '2026-05-09T17:00:01Z' })
+    createChannel(doc, {
+      id: channelId,
+      name: 'general',
+      kind: 'text',
+      categoryId: null,
+      createdBy: aliceId,
+      createdAt: '2026-05-09T17:00:02Z',
+    })
+  })
+  return { channelId, aliceId, bobId }
+}
+
+function sendChatMessage(
+  handle: DocHandle<WorkspaceDoc>,
+  input: { channelId: ChannelId; authorId: MemberId; body: string; createdAt: string },
+): void {
+  handle.change((doc) => {
+    sendMessage(doc, {
+      id: newId('msg'),
+      channelId: input.channelId,
+      authorId: input.authorId,
+      body: input.body,
+      createdAt: input.createdAt,
+    })
+  })
+}
+
+async function startServer(dataDir?: string): Promise<StartedServer> {
+  const resolvedDataDir = dataDir ?? await mkdtemp(join(tmpdir(), 'autodisco-sync-test-'))
   const config: ServerConfig = {
     host: '127.0.0.1',
     port: 0,
-    dataDir,
+    dataDir: resolvedDataDir,
     publicBaseUrl: 'http://127.0.0.1:0',
     syncPath: '/sync',
   }
@@ -108,9 +138,20 @@ async function startServer(): Promise<StartedServer> {
   const baseUrl = `http://127.0.0.1:${address.port}`
   config.publicBaseUrl = baseUrl
   const syncUrl = `ws://127.0.0.1:${address.port}/sync`
-  const started = { chat, server, dataDir, baseUrl, syncUrl }
+  const started = { chat, server, dataDir: resolvedDataDir, baseUrl, syncUrl }
   runningServers.push(started)
   return started
+}
+
+async function stopServer(started: StartedServer, options: { removeDataDir: boolean }): Promise<void> {
+  removeRunningServer(started)
+  chatClose(started.chat)
+  await new Promise<void>((resolve, reject) => started.server.close((err) => (err ? reject(err) : resolve())))
+  if (options.removeDataDir) await rm(started.dataDir, { recursive: true, force: true })
+}
+
+function chatClose(chat: ChatServer): void {
+  chat.runtime.wss.close()
 }
 
 function createClientRepo(name: string, syncUrl: string): Repo {
@@ -120,6 +161,16 @@ function createClientRepo(name: string, syncUrl: string): Repo {
   })
   runningRepos.push(repo)
   return repo
+}
+
+function removeRunningRepo(repo: Repo): void {
+  const index = runningRepos.indexOf(repo)
+  if (index >= 0) runningRepos.splice(index, 1)
+}
+
+function removeRunningServer(started: StartedServer): void {
+  const index = runningServers.indexOf(started)
+  if (index >= 0) runningServers.splice(index, 1)
 }
 
 async function bootstrapWorkspace(baseUrl: string, name: string): Promise<{ workspaceDocUrl: string; syncUrl: string }> {
@@ -132,14 +183,14 @@ async function bootstrapWorkspace(baseUrl: string, name: string): Promise<{ work
   return (await response.json()) as { workspaceDocUrl: string; syncUrl: string }
 }
 
-async function waitForMessages(handle: { doc(): WorkspaceDoc; on: (event: 'change', listener: () => void) => void; off: (event: 'change', listener: () => void) => void }, channelId: ChannelId, bodies: string[]): Promise<void> {
+async function waitForMessages(handle: DocHandle<WorkspaceDoc>, channelId: ChannelId, bodies: string[]): Promise<void> {
   await waitForDoc(handle, (doc) => {
     const actual = (doc.messagesByChannel[channelId] ?? []).map((message) => message.body).sort()
     return bodies.every((body) => actual.includes(body))
   })
 }
 
-function waitForDoc(handle: { doc(): WorkspaceDoc; on: (event: 'change', listener: () => void) => void; off: (event: 'change', listener: () => void) => void }, predicate: (doc: WorkspaceDoc) => boolean, timeoutMs = 5_000): Promise<void> {
+function waitForDoc(handle: DocHandle<WorkspaceDoc>, predicate: (doc: WorkspaceDoc) => boolean, timeoutMs = 5_000): Promise<void> {
   if (predicate(handle.doc())) return Promise.resolve()
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {

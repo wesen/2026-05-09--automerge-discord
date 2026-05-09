@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:25:00-04:00
+LastUpdated: 2026-05-09T13:30:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -1114,5 +1114,90 @@ The bootstrap endpoint returns a sync URL based on `publicBaseUrl`. In tests the
 ### Technical details
 
 Primary file added:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`
+
+
+## Step 13: Add relay persistence/restart coverage
+
+I extended the Automerge relay integration coverage so it now proves not only peer-to-peer convergence through the relay, but also server-side persistence across relay restart.
+
+### Prompt Context
+
+**User prompt (verbatim):** "you can use devctl start/stop-service btw to keep say, vite and storybook up since they hot reload.
+
+continue"
+
+**Assistant interpretation:** Continue normal development, keeping the new devctl service commands in mind for frontend work, and proceed with the next sync validation checkpoint.
+
+**Inferred user intent:** The user wants steady implementation progress with commits and diary updates, and does not want the development server workflow to be restarted unnecessarily when hot-reload services can remain up.
+
+### What I did
+
+- Extended `packages/chat-server/test/sync.test.ts` with a persistence/restart test.
+- The test starts a relay with a temporary `DATA_DIR`, bootstraps a workspace, connects an Alice client, initializes workspace membership/channel state, and sends a message through `DocHandle.change`.
+- It waits until the server-side Repo handle sees the message, flushes the Repo to the `NodeFSStorageAdapter`, shuts down Alice, and stops the first relay while keeping the data directory.
+- It starts a second relay using the same data directory.
+- It verifies the restarted server can load the same `automerge:...` URL from local storage.
+- It connects a fresh Charlie client to the restarted relay and verifies Charlie can load the persisted message.
+
+### Why
+
+The previous test proved live synchronization between two clients. This test proves the relay is also durable: a fresh process can recover a workspace document from `NodeFSStorageAdapter` and serve it to a newly connected peer.
+
+### What worked
+
+The chat-server test suite passed after the persistence test was fixed:
+
+```bash
+npm --workspace @autodisco/chat-server test
+```
+
+Full validation passed:
+
+```bash
+npm run typecheck
+npm test
+```
+
+### What didn't work
+
+The first persistence-test attempt timed out because I stopped the relay before shutting down Alice's WebSocket client. The HTTP server close waited on the still-open upgraded connection. I fixed the ordering so the client Repo shuts down before stopping the relay.
+
+After that, Charlie initially failed to find the document after restart with:
+
+```text
+Error: Document automerge:... is unavailable
+```
+
+A standalone debug run showed that the storage files were present and that the restarted server could load the document locally. I adjusted the test to explicitly load the document in the restarted server Repo first, then verify that a fresh remote client can sync it. This makes the persistence assertion clear and avoids treating server lazy-loading behavior as the thing under test.
+
+### What I learned
+
+The server storage path contains Automerge snapshot data plus a storage adapter id. The relay can recover a document after restart, but the test is more deterministic if it first verifies local recovery on the restarted server and then verifies remote client sync from that recovered handle.
+
+### What was tricky to build
+
+The lifecycle ordering matters: close client Repos before closing the server, close the WebSocketServer, then close the HTTP server. Otherwise open upgraded WebSocket connections can keep `server.close()` pending.
+
+### What warrants a second pair of eyes
+
+- Review whether restarted relay lazy-loading should work directly from a remote client request; if yes, add a separate targeted test.
+- Review whether the production server should eagerly load known workspace documents or maintain an index of bootstrapped workspaces.
+
+### What should be done in the future
+
+- Add offline/reconnect convergence coverage with local client storage.
+- Consider an index document for known workspaces if servers need to advertise or preload documents after restart.
+- Reuse these test helpers when wiring browser Automerge state.
+
+### Code review instructions
+
+- In `packages/chat-server/test/sync.test.ts`, review `persists synced workspace edits across relay restarts`.
+- Confirm the message is written through an Automerge handle, flushed through server storage, loaded after process restart, and then synced to a fresh client.
+
+### Technical details
+
+Primary file changed:
 
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`

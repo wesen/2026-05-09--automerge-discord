@@ -58,7 +58,7 @@
 - [x] Move the AUTODISCO web service to explicit port `5174` with strict port checking to avoid the user's existing app on `5173`.
 - [x] Validate with typecheck, build, tests, Storybook build, devctl plan/up/check, and Playwright smoke review.
 - [x] Add a two-peer Automerge Repo integration test through the relay.
-- [ ] Add a persistence/restart sync test using the server storage adapter.
+- [x] Add a persistence/restart sync test using the server storage adapter.
 - [ ] Add an offline/reconnect convergence test with client-side storage.
 - [ ] Add browser Automerge Repo/DocHandle wiring so the web UI uses live distributed state instead of fixtures.
 - [ ] Add Playwright two-context sync tests after live browser Automerge wiring.

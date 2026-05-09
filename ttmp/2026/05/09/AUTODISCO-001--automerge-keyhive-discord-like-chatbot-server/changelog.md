@@ -64,3 +64,11 @@ Added a real multi-peer Automerge relay integration test that starts the server,
 ### Related Files
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — two-peer Automerge relay sync test
+
+## 2026-05-09
+
+Extended relay integration coverage with a persistence/restart test: a message written through a client Automerge handle is observed by the server Repo, flushed to NodeFS storage, reloaded by a restarted relay, and synced to a fresh client.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — relay sync and persistence integration tests
