@@ -137,3 +137,12 @@ Fixed Keyhive profile UI mode reporting. The server now exposes `/api/bootstrap/
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — runtime ACL mode in the identity card
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx — clearer workspace sharing labels
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx — access-level explanation
+
+## 2026-05-09
+
+Fixed AUTODISCO web panel overflow and join-link paste behavior. Long Keyhive/Automerge identifiers now wrap inside panels, and the open-workspace form accepts either a raw `automerge:` URL or a full AUTODISCO join link with `doc`/`workspace` and `sync` query parameters.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/index.css — panel overflow/wrapping fixes
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm/OpenWorkspaceForm.tsx — parse pasted join links and auto-fill relay URL

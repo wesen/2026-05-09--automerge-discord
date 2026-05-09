@@ -12,9 +12,10 @@
 * { box-sizing: border-box; }
 html, body, #root { min-height: 100%; margin: 0; }
 body { image-rendering: pixelated; }
-button, input { font: inherit; }
+button, input, textarea, select { font: inherit; max-width: 100%; }
 
 :where([data-widget="autodisco"]) {
+  min-width: 0;
   --mac-bg: #bdbdbd;
   --mac-surface: #f5f5f5;
   --mac-inset: #e5e5e5;
@@ -52,23 +53,27 @@ button, input { font: inherit; }
 :where([data-widget="autodisco"]) [data-part="mac-panel"],
 :where([data-widget="autodisco"]) [data-part="workspace-card"],
 :where([data-widget="autodisco"]) [data-part="identity-card"] {
+  min-width: 0;
+  overflow: hidden;
   border: 2px solid var(--mac-border-dark);
   background: var(--mac-surface);
   box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid);
 }
 :where([data-widget="autodisco"]) [data-part="mac-panel"][data-inset="true"] { background: var(--mac-inset); box-shadow: inset 1px 1px 0 var(--mac-border-mid), inset -1px -1px 0 var(--mac-border-light); }
 :where([data-widget="autodisco"]) [data-part="mac-panel-title"] { margin: 0; padding: var(--mac-space-2) var(--mac-space-3); border-bottom: 2px solid var(--mac-border-dark); font-size: var(--mac-font-size); text-transform: uppercase; }
-:where([data-widget="autodisco"]) [data-part="mac-panel-body"] { padding: var(--mac-space-4); display: grid; gap: var(--mac-space-4); }
+:where([data-widget="autodisco"]) [data-part="mac-panel-body"] { min-width: 0; padding: var(--mac-space-4); display: grid; gap: var(--mac-space-4); }
+:where([data-widget="autodisco"]) [data-part="mac-panel-body"] > * { min-width: 0; }
 
-:where([data-widget="autodisco"]) [data-part="mac-field"] { display: grid; gap: var(--mac-space-1); }
+:where([data-widget="autodisco"]) [data-part="mac-field"] { min-width: 0; display: grid; gap: var(--mac-space-1); }
 :where([data-widget="autodisco"]) [data-part="mac-field-label"] { font-weight: 700; }
 :where([data-widget="autodisco"]) [data-part="mac-input"],
 :where([data-widget="autodisco"]) [data-part="composer-input"],
 :where([data-widget="autodisco"]) [data-part="invitation-form"] select,
 :where([data-widget="autodisco"]) [data-part="invite-contact-card"] { width: 100%; border: 1px solid var(--mac-border-dark); background: #fff; color: var(--mac-text); padding: var(--mac-space-2); box-shadow: inset 1px 1px 0 var(--mac-border-mid), inset -1px -1px 0 var(--mac-border-light); }
 :where([data-widget="autodisco"]) [data-part="invite-contact-card"] { resize: vertical; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; line-height: 1.25; }
-:where([data-widget="autodisco"]) [data-part="mac-field-helper"] { color: var(--mac-muted); font-size: 12px; }
-:where([data-widget="autodisco"]) [data-part="form-error"] { color: var(--mac-danger); margin: 0; }
+:where([data-widget="autodisco"]) [data-part="mac-field-helper"] { color: var(--mac-muted); font-size: 12px; overflow-wrap: anywhere; }
+:where([data-widget="autodisco"]) [data-part="form-hint"] { color: var(--mac-muted); overflow-wrap: anywhere; }
+:where([data-widget="autodisco"]) [data-part="form-error"] { color: var(--mac-danger); margin: 0; overflow-wrap: anywhere; }
 
 :where([data-widget="autodisco"]) [data-part="status-pill"] { display: inline-block; border: 1px solid var(--mac-border-dark); padding: 1px var(--mac-space-2); background: var(--mac-surface); text-transform: uppercase; font-size: 11px; }
 :where([data-widget="autodisco"]) [data-part="status-pill"][data-tone="ok"] { color: var(--mac-accent); }
@@ -79,7 +84,7 @@ button, input { font: inherit; }
 :where([data-widget="autodisco"]) [data-part="hero-panel"] { min-width: 0; }
 :where([data-widget="autodisco"]) [data-part="bootstrap-form"],
 :where([data-widget="autodisco"]) [data-part="open-workspace-form"],
-:where([data-widget="autodisco"]) [data-part="invitation-form"] { display: grid; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="invitation-form"] { min-width: 0; display: grid; gap: var(--mac-space-3); }
 :where([data-widget="autodisco"]) [data-part="workspace-card"],
 :where([data-widget="autodisco"]) [data-part="identity-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
 :where([data-widget="autodisco"]) [data-part="workspace-card-header"],
@@ -89,7 +94,7 @@ button, input { font: inherit; }
 :where([data-widget="autodisco"]) [data-part="workspace-card"] dl,
 :where([data-widget="autodisco"]) [data-part="identity-card"] dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--mac-space-1) var(--mac-space-2); margin: 0; }
 :where([data-widget="autodisco"]) [data-part="workspace-card"] dd,
-:where([data-widget="autodisco"]) [data-part="identity-card"] dd { margin: 0; overflow-wrap: anywhere; color: var(--mac-muted); }
+:where([data-widget="autodisco"]) [data-part="identity-card"] dd { min-width: 0; margin: 0; overflow-wrap: anywhere; word-break: break-word; color: var(--mac-muted); }
 :where([data-widget="autodisco"]) [data-part="workspace-actions"],
 :where([data-widget="autodisco"]) [data-part="identity-actions"] { display: flex; flex-wrap: wrap; gap: var(--mac-space-2); }
 :where([data-widget="autodisco"]) [data-part="work-area"] { min-width: 0; min-height: calc(100vh - 2rem); display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--mac-space-3); }

@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:44:00-04:00
+LastUpdated: 2026-05-09T16:50:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1292,3 +1292,37 @@ npm run build
 ```
 
 All validation passed.
+
+## Step 17: Fix left panel overflow and join-link paste behavior
+
+The screenshot of the Keyhive profile UI showed long identifiers and helper text overflowing out of the left AUTODISCO panel. The same review also clarified that the `Automerge URL` open field was confusing because the helper text implied a copied join link could be pasted there, but the form submitted the raw pasted URL instead of extracting its `doc` and `sync` parameters.
+
+### Prompt Context
+
+**User prompt (verbatim):** "This panel should properly expand. Also, I don't think the \"paste Automerge URL\" field works"
+
+**Assistant interpretation:** Make the setup/sidebar panel robust for long CRDT/Keyhive identifiers and make the open-workspace form accept both raw `automerge:` URLs and full AUTODISCO join links.
+
+### What changed
+
+- Hardened `packages/chat-web/src/index.css` for narrow panels and long values:
+  - widgets now opt into `min-width: 0`;
+  - Mac panels/cards hide overflow instead of letting content draw into the chat pane;
+  - panel body children can shrink;
+  - helper/error/hint text wraps with `overflow-wrap: anywhere`;
+  - workspace and identity card values use `word-break: break-word`.
+- Updated `OpenWorkspaceForm`:
+  - label changed from `Automerge URL` to `Automerge URL or Join Link`;
+  - pasting a full join link now extracts `doc`/`workspace` and `sync` query parameters;
+  - if the join link includes `sync`, the relay URL field auto-fills;
+  - submitting a join link opens the underlying Automerge document instead of trying to pass the full HTTP URL to Automerge Repo.
+
+### Validation
+
+```bash
+npm run typecheck
+npm test
+npm run build
+```
+
+I also inspected the running Keyhive profile at a narrow viewport using Playwright. The left panel switched to the one-column responsive layout, the identity card showed `keyhive-experimental`, and long Keyhive identifiers wrapped inside the panel instead of overflowing.
