@@ -11,7 +11,7 @@
 - Committed the research ticket baseline as `c1d2f4b6922689b1192737e746640566f1d6235b`.
 - Built Phase 0 scaffold: root npm workspace, TypeScript base config, and package directories for `chat-core`, `chat-server`, `chat-client`, `chat-acl`, and `chat-bot-worker`.
 - Built Phase 1 Automerge data model: branded IDs, workspace schemas, mutation helpers, and Vitest coverage for concurrent merge, reactions, edits, and idempotent bot runs.
-- Built Phase 2 relay/app server: Express app, Automerge Repo with WebSocket server adapter and NodeFS storage, `/healthz`, `/api/bootstrap/workspaces`, `/sync` upgrade handling, and bootstrap integration test.
+- Built Phase 2 relay/app server: Express app, Automerge Repo with WebSocket server adapter and NodeFS storage, `/healthz`, `/api/bootstrap/workspaces`, `/sync` upgrade handling, and bootstrap integration test. Committed as `4994baf102c9c157a242dda7c8f55e00b85aa780`.
 - Added initial Phase 3/5 scaffolding: in-memory ACL adapter and minimal bot worker response helper.
 - Validated implementation with `npm run typecheck`, `npm run build`, and `npm test`.
 
@@ -23,4 +23,14 @@ Completed research package: captured sources, cloned vendor repos, added Automer
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/design-doc/01-automerge-keyhive-discord-like-chatbot-server-design-guide.md — Primary research deliverable
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/reference/01-investigation-diary.md — Chronological investigation record
+
+
+## 2026-05-09
+
+Implemented Phases 0-2 and committed as 4994baf102c9c157a242dda7c8f55e00b85aa780.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/mutations.ts — Phase 1 model
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — Phase 2 server
 

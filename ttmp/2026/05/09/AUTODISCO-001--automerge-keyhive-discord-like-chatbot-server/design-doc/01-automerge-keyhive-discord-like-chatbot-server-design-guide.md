@@ -13,6 +13,12 @@ DocType: design-doc
 Intent: long-term
 Owners: []
 RelatedFiles:
+    - Path: packages/chat-acl/src/index.ts
+      Note: Initial ACL adapter matching the design boundary
+    - Path: packages/chat-core/src/types.ts
+      Note: Implemented Phase 1 schemas from the design
+    - Path: packages/chat-server/src/repo.ts
+      Note: Implemented Phase 2 Automerge Repo relay runtime
     - Path: ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/scripts/automerge-chat-model-smoke.mjs
       Note: Runnable Automerge merge smoke experiment
     - Path: ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/sources/web/01-automerge-concepts.md
@@ -38,6 +44,7 @@ LastUpdated: 2026-05-09T12:45:00-04:00
 WhatFor: Use when implementing the first prototype or onboarding an intern to the architecture.
 WhenToUse: Before writing server code, defining document schemas, or deciding how CRDT sync and access control interact.
 ---
+
 
 
 # Automerge Keyhive Discord-like Chatbot Server Design Guide

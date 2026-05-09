@@ -13,6 +13,20 @@ DocType: reference
 Intent: long-term
 Owners: []
 RelatedFiles:
+    - Path: package.json
+      Note: Phase 0 workspace scaffold and validation scripts
+    - Path: packages/chat-acl/src/index.ts
+      Note: Initial mock ACL adapter scaffold
+    - Path: packages/chat-core/src/mutations.ts
+      Note: Phase 1 Automerge mutation helpers
+    - Path: packages/chat-core/test/workspace.test.ts
+      Note: Phase 1 CRDT merge and bot-run tests
+    - Path: packages/chat-server/src/app.ts
+      Note: Phase 2 Express app and WebSocket upgrade wiring
+    - Path: packages/chat-server/src/http/bootstrap.ts
+      Note: Phase 2 workspace bootstrap API
+    - Path: packages/chat-server/test/bootstrap.test.ts
+      Note: Phase 2 server integration test
     - Path: ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/design-doc/01-automerge-keyhive-discord-like-chatbot-server-design-guide.md
       Note: Primary deliverable documented by the diary
     - Path: ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/scripts/automerge-chat-model-smoke.mjs
@@ -23,6 +37,7 @@ LastUpdated: 2026-05-09T12:48:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
+
 
 
 # Diary
@@ -692,3 +707,80 @@ Primary files:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
+
+## Step 9: Commit Phase 0–2 implementation and validate ticket state
+
+I committed the implementation of Phases 0, 1, and 2 after the root typecheck, build, and tests passed. This commit is the prototype checkpoint the next engineer should use when continuing into ACL wiring and Keyhive integration.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 5)
+
+**Assistant interpretation:** Finish Phase 0–2 and commit the result at a sensible checkpoint.
+
+**Inferred user intent:** The user wants to come back to a working, committed prototype rather than a partially modified working tree.
+
+**Commit (code):** `4994baf102c9c157a242dda7c8f55e00b85aa780` — "Build AUTODISCO phases 0-2"
+
+### What I did
+
+- Staged root workspace files, package source files, tests, task updates, changelog updates, and diary updates.
+- Checked staged content for ignored/noisy artifacts.
+- Committed the implementation as `4994baf102c9c157a242dda7c8f55e00b85aa780`.
+
+### Why
+
+Phases 0–2 are a natural review checkpoint: the scaffold exists, the CRDT model is tested, and the server can create workspace documents and expose sync plumbing.
+
+### What worked
+
+The commit succeeded and validation passed before the commit:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+```
+
+### What didn't work
+
+N/A at commit time. Earlier implementation failures are recorded in Steps 7 and 8.
+
+### What I learned
+
+The project is now in a state where future work can focus on authorization and runtime behavior instead of basic package setup.
+
+### What was tricky to build
+
+The main tricky pieces were already addressed before commit: Automerge `undefined` handling, reaction assignment semantics, TypeScript build order, and the `ws` type mismatch.
+
+### What warrants a second pair of eyes
+
+- Review `packages/chat-server/src/repo.ts`, especially the temporary `wss as never` cast.
+- Review the package export strategy, which currently favors source-level Vitest/tsx execution.
+- Review whether generated `dist/` and `*.tsbuildinfo` should be deleted after local validation or simply left ignored.
+
+### What should be done in the future
+
+Continue with Phase 3 by wiring the mock ACL adapter into chat mutation wrappers and relay admission/sharing decisions.
+
+### Code review instructions
+
+- Review commit `4994baf102c9c157a242dda7c8f55e00b85aa780`.
+- Run:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+```
+
+### Technical details
+
+Files introduced in the commit are under:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-client`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-bot-worker`
