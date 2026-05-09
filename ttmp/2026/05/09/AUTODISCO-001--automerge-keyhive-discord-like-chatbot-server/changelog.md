@@ -8,6 +8,12 @@
 - Cloned upstream repositories under `vendor/` for file-backed implementation references.
 - Added and ran `scripts/automerge-chat-model-smoke.mjs`; fixed `A.merge` usage after validating the current API returns a document directly.
 - Wrote the full intern-oriented design and implementation guide with diagrams, schemas, pseudocode, APIs, implementation phases, risks, and references.
+- Committed the research ticket baseline as `c1d2f4b6922689b1192737e746640566f1d6235b`.
+- Built Phase 0 scaffold: root npm workspace, TypeScript base config, and package directories for `chat-core`, `chat-server`, `chat-client`, `chat-acl`, and `chat-bot-worker`.
+- Built Phase 1 Automerge data model: branded IDs, workspace schemas, mutation helpers, and Vitest coverage for concurrent merge, reactions, edits, and idempotent bot runs.
+- Built Phase 2 relay/app server: Express app, Automerge Repo with WebSocket server adapter and NodeFS storage, `/healthz`, `/api/bootstrap/workspaces`, `/sync` upgrade handling, and bootstrap integration test.
+- Added initial Phase 3/5 scaffolding: in-memory ACL adapter and minimal bot worker response helper.
+- Validated implementation with `npm run typecheck`, `npm run build`, and `npm test`.
 
 ## 2026-05-09
 

@@ -1,6 +1,6 @@
 # Tasks
 
-## Completed
+## Completed research tasks
 
 - [x] Create docmgr ticket workspace for AUTODISCO-001.
 - [x] Add primary design guide and investigation diary documents.
@@ -11,10 +11,59 @@
 - [x] Write the intern-oriented design and implementation guide.
 - [x] Upload the documentation bundle to reMarkable.
 
-## Follow-up implementation tasks
+## Implementation phases
 
-- [ ] Scaffold the proposed TypeScript monorepo (`chat-core`, `chat-server`, `chat-client`, `chat-acl`, `chat-bot-worker`).
-- [ ] Promote `scripts/automerge-chat-model-smoke.mjs` into a real unit test.
-- [ ] Implement the mock `AccessControlAdapter` before integrating Keyhive.
-- [ ] Spike `keyhive_wasm` in the intended runtime and verify contact-card, add-member, revoke-member, encrypt/decrypt, and event-ingest flows.
+### Phase 0: Repository scaffold and documentation
+
+- [x] Create root npm workspace and TypeScript base config.
+- [x] Add package directories for `chat-core`, `chat-server`, `chat-client`, `chat-acl`, and `chat-bot-worker`.
+- [x] Add shared build, typecheck, test, and server dev scripts.
+- [x] Add `.gitignore` entries for Node/build artifacts.
+- [x] Keep implementation diary and changelog current.
+
+### Phase 1: Automerge data model
+
+- [x] Define branded IDs and chat/workspace TypeScript schemas.
+- [x] Implement workspace and channel-message document constructors.
+- [x] Implement core mutation helpers for members, roles, channels, messages, reactions, and bot runs.
+- [x] Promote the smoke experiment into Vitest coverage for concurrent Automerge merges.
+- [x] Add idempotent bot-run ID behavior for worker restart safety.
+- [x] Validate with `npm test`.
+
+### Phase 2: Relay/app server
+
+- [x] Implement Express application shell with `/healthz`.
+- [x] Configure an Automerge `Repo` with WebSocket server adapter and Node filesystem storage.
+- [x] Mount WebSocket upgrade handling at `/sync`.
+- [x] Add `POST /api/bootstrap/workspaces` to create workspace documents and return doc/sync metadata.
+- [x] Add placeholder invitation endpoint documenting that real Keyhive invitations are Phase 4.
+- [x] Add server integration test for workspace bootstrap.
+- [x] Validate with `npm run typecheck`, `npm run build`, and `npm test`.
+
+### Phase 3: Mock ACL adapter
+
+- [x] Implement initial `AccessControlAdapter` interface and in-memory mock adapter in `chat-acl`.
+- [ ] Wire mock ACL checks into chat-client mutation wrappers.
+- [ ] Wire mock ACL identity into relay sharing/admission decisions.
+
+### Phase 4: Keyhive integration spike
+
+- [ ] Spike `keyhive_wasm` in the intended runtime.
+- [ ] Verify contact-card exchange.
+- [ ] Verify add-member and revoke-member flows.
+- [ ] Verify encrypt/decrypt round trip.
+- [ ] Verify event export and ingest flows.
 - [ ] Validate whether `automerge-repo` `sharePolicy` has enough peer identity context for Keyhive-aware sharing.
+
+### Phase 5: Bot worker
+
+- [x] Scaffold `chat-bot-worker` and add a minimal idempotent response helper.
+- [ ] Connect bot worker to an Automerge repo and channel watcher.
+- [ ] Add LLM/tool-call abstraction and tests for duplicate prevention.
+
+### Phase 6: E2EE/Beelay-compatible sync path
+
+- [ ] Design and prototype signed envelope authentication.
+- [ ] Prototype membership graph sync.
+- [ ] Prototype document collection sync.
+- [ ] Prototype encrypted document content sync.

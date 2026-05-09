@@ -1,0 +1,31 @@
+{
+  "name": "automerge-discord",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b packages/chat-core packages/chat-acl packages/chat-client packages/chat-bot-worker packages/chat-server",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "tsc -b packages/chat-core packages/chat-acl packages/chat-client packages/chat-bot-worker packages/chat-server --pretty false",
+    "dev:server": "npm --workspace @autodisco/chat-server run dev"
+  },
+  "dependencies": {
+    "@automerge/automerge": "latest",
+    "@automerge/automerge-repo": "latest",
+    "@automerge/automerge-repo-network-websocket": "latest",
+    "@automerge/automerge-repo-storage-nodefs": "latest",
+    "express": "latest",
+    "ws": "latest"
+  },
+  "devDependencies": {
+    "@types/express": "latest",
+    "@types/node": "latest",
+    "@types/ws": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

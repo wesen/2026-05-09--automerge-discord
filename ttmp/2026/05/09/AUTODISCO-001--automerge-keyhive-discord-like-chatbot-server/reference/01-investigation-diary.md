@@ -361,3 +361,334 @@ Key local references used:
 - `vendor/keyhive/keyhive_wasm/src/js/keyhive.rs`
 - `sources/web/08-keyhive-notebook.md`
 - `scripts/automerge-chat-model-smoke.mjs`
+
+## Step 5: Commit the research baseline before implementation
+
+I committed the completed research-ticket baseline before starting implementation. This gave the implementation work a clean checkpoint and made it easier to review Phase 0–2 changes separately from the source-gathering and design work.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Ok, add tasks for the different phases if you haven't already, then build phase 0 - 1 - 2.
+
+I expect you to be done when i come back. Commit at appropriate intervals, keep a diary"
+
+**Assistant interpretation:** Turn the design-guide phases into tracked tasks, implement the scaffold/data-model/server phases, commit at useful checkpoints, and keep this diary current.
+
+**Inferred user intent:** The user wants the research package to become an actual prototype implementation while preserving reviewable history and continuation notes.
+
+### What I did
+
+- Added a root `.gitignore` for Node and build artifacts.
+- Staged the previously generated ticket materials.
+- Removed embedded `.git` directories from cloned vendor repositories so they would not be committed as accidental submodules.
+- Committed the research ticket baseline.
+
+### Why
+
+Implementation should not be mixed with the initial research baseline. Committing the baseline first makes later Phase 0–2 commits easier to inspect.
+
+### What worked
+
+- The baseline commit succeeded.
+- Commit hash: `c1d2f4b6922689b1192737e746640566f1d6235b`.
+
+### What didn't work
+
+The first `git add` treated cloned repositories as embedded repositories and printed warnings such as:
+
+```text
+warning: adding embedded git repository: ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/vendor/automerge-repo-sync-server
+```
+
+I fixed this by removing the staged gitlinks with `git rm --cached -f ...`, deleting nested `.git` directories under the ticket `vendor/`, and re-adding the vendor files as ordinary source artifacts.
+
+### What I learned
+
+When cloning upstream repositories into a ticket workspace, remove nested `.git` directories before staging unless the intent is to create submodules.
+
+### What was tricky to build
+
+The tricky part was distinguishing “vendor source material that belongs in the ticket” from “nested Git repository metadata that should not become a submodule.” The solution was to keep the files but remove the nested repository metadata.
+
+### What warrants a second pair of eyes
+
+Reviewers should confirm that committing the ticket `vendor/` content is acceptable for this repository. It is about 9.5 MB and was intentionally included as research evidence.
+
+### What should be done in the future
+
+For future research tickets, remove nested `.git` directories immediately after cloning repos into ticket `vendor/`.
+
+### Code review instructions
+
+- Review commit `c1d2f4b6922689b1192737e746640566f1d6235b` as the research baseline.
+- Confirm no `node_modules/`, `dist/`, or `.env` artifacts were included.
+
+### Technical details
+
+Commands included:
+
+```bash
+git add .gitignore .ttmp.yaml ttmp
+git rm --cached -f ttmp/.../vendor/automerge-repo ttmp/.../vendor/automerge-repo-sync-server ttmp/.../vendor/keyhive
+find ttmp/.../vendor -name .git -type d -prune -exec rm -rf {} +
+git add ttmp/.../vendor
+git commit -m "Add AUTODISCO research ticket"
+git rev-parse HEAD
+```
+
+## Step 6: Build Phase 0 repository scaffold
+
+I created the TypeScript workspace structure proposed by the design guide. This is the foundation for implementation: each major responsibility has a package boundary, and the root package provides shared build, typecheck, test, and dev commands.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 5)
+
+**Assistant interpretation:** Implement Phase 0 from the design guide.
+
+**Inferred user intent:** The user wants the prototype to start with maintainable package boundaries rather than ad hoc scripts.
+
+### What I did
+
+- Created root `package.json` with npm workspaces.
+- Added `tsconfig.base.json`.
+- Created packages:
+  - `packages/chat-core`
+  - `packages/chat-server`
+  - `packages/chat-client`
+  - `packages/chat-acl`
+  - `packages/chat-bot-worker`
+- Installed dependencies: Automerge, Automerge Repo, WebSocket network adapter, NodeFS storage adapter, Express, `ws`, TypeScript, Vitest, and `tsx`.
+- Added `.gitignore` entries for `node_modules/`, `dist/`, logs, env files, and `*.tsbuildinfo`.
+
+### Why
+
+The design guide recommends separating pure CRDT model code from server, ACL, client, and bot concerns. This keeps Phase 1 data-model tests independent from Phase 2 server plumbing.
+
+### What worked
+
+- `npm install --silent` completed successfully.
+- The workspace packages were linked by npm.
+
+### What didn't work
+
+N/A for scaffold creation.
+
+### What I learned
+
+The repo had no implementation code yet, so the scaffold could follow the ticket’s proposed package layout directly.
+
+### What was tricky to build
+
+TypeScript project references require care when packages import each other. I used root `tsc -b` commands for typecheck/build so referenced package outputs are built in dependency order.
+
+### What warrants a second pair of eyes
+
+Review package boundaries and decide whether `chat-client` should remain minimal or become a full browser package in the next phase.
+
+### What should be done in the future
+
+Add linting and formatting once implementation style stabilizes.
+
+### Code review instructions
+
+- Start with root `package.json` and `tsconfig.base.json`.
+- Then inspect each `packages/*/package.json` and `tsconfig.json`.
+- Validate with `npm run typecheck`.
+
+### Technical details
+
+Primary files:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/tsconfig.base.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/*/package.json`
+
+## Step 7: Build Phase 1 Automerge data model
+
+I implemented the core Automerge-friendly chat model and promoted the earlier smoke experiment into Vitest coverage. The model now has branded IDs, workspace schemas, mutation helpers, and tests for merge behavior and bot-run idempotency.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 5)
+
+**Assistant interpretation:** Implement Phase 1 from the design guide.
+
+**Inferred user intent:** The user wants the CRDT data model proven before the server layer grows around it.
+
+### What I did
+
+- Added branded ID types and `newId()` helpers.
+- Added workspace, channel, member, role, message, bot config, and bot run schemas.
+- Added `createWorkspaceDoc()` and `createChannelMessagesDoc()` constructors.
+- Added mutation helpers for members, roles, categories, channels, messages, edits, deletes, reactions, and bot runs.
+- Added deterministic `stableBotRunId(channelId, messageId, botId)` to prevent duplicate bot responses after worker restarts.
+- Added Vitest tests for:
+  - concurrent Automerge channel/member/message creation and merge,
+  - message edit plus reaction,
+  - idempotent bot run creation and completion.
+
+### Why
+
+Automerge rejects some normal JavaScript object shapes, such as objects containing `undefined`, and CRDT merge behavior should be validated at the model layer before HTTP or WebSocket code is involved.
+
+### What worked
+
+The final test run passed:
+
+```text
+Test Files  1 passed (1)
+Tests  3 passed (3)
+```
+
+### What didn't work
+
+The first Phase 1 test run failed because Automerge rejects assigning `undefined` values inside object trees:
+
+```text
+RangeError: Cannot assign undefined value at /members/mem_alice/bot, You might consider setting the property's value to `null`, or using `delete` to remove it altogether.
+```
+
+I fixed this by adding `withoutUndefined()` and using it when constructing member, channel, and message records.
+
+A second test failed because initializing and mutating a nested reaction array in the same helper did not persist as expected:
+
+```text
+AssertionError: expected [] to deeply equal [ 'mem_alice' ]
+```
+
+I fixed this by assigning a new array with `message.reactions[emoji] = [...members, memberId]` instead of mutating a freshly defaulted array reference.
+
+### What I learned
+
+Automerge model helpers should avoid `undefined` entirely and should prefer assignment of complete replacement values for newly initialized nested collections.
+
+### What was tricky to build
+
+The tricky part was making mutation helpers feel like ordinary TypeScript while respecting Automerge proxy constraints. Optional fields cannot be casually included as `undefined`; helpers must either omit them or use explicit `null` when null is semantically meaningful.
+
+### What warrants a second pair of eyes
+
+- The `BotId`/`MemberId` relationship needs a domain decision: bots are actors like members, but the current prototype keeps separate branded ID types.
+- Reaction semantics should be reviewed under concurrent add/remove in a future test.
+
+### What should be done in the future
+
+Add tests for concurrent edits to the same message body, concurrent reaction add/remove, and per-channel document splitting.
+
+### Code review instructions
+
+- Start with `packages/chat-core/src/types.ts`.
+- Then read `packages/chat-core/src/mutations.ts`.
+- Validate with `npm --workspace @autodisco/chat-core test` or root `npm test`.
+
+### Technical details
+
+Primary files:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/types.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/ids.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/workspace.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/mutations.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/test/workspace.test.ts`
+
+## Step 8: Build Phase 2 relay/app server
+
+I implemented the first server slice: an Express application that creates an Automerge Repo backed by filesystem storage, mounts a WebSocket sync endpoint, exposes health checks, and creates workspace documents through a bootstrap endpoint.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 5)
+
+**Assistant interpretation:** Implement Phase 2 from the design guide.
+
+**Inferred user intent:** The user wants a runnable relay/app server skeleton that can create documents and host Automerge sync.
+
+### What I did
+
+- Added `loadConfig()` and `syncUrl()` helpers.
+- Added `createRepoRuntime()` to configure:
+  - `Repo`,
+  - `WebSocketServerAdapter`,
+  - `NodeFSStorageAdapter`,
+  - filesystem data directory,
+  - conservative `sharePolicy: async () => false`.
+- Added Express app factory with `/healthz`.
+- Added `POST /api/bootstrap/workspaces` to create an Automerge workspace document and return `workspaceId`, `workspaceDocUrl`, and `syncUrl`.
+- Added placeholder `POST /api/bootstrap/invitations/accept` returning `501` until Keyhive Phase 4.
+- Added WebSocket upgrade routing for `/sync`.
+- Added a Vitest integration test that starts the server on port `0`, calls the bootstrap endpoint, and verifies returned metadata.
+
+### Why
+
+Phase 2 makes the CRDT model accessible through a real service without pretending Keyhive invitation logic is done. It follows the design guide’s relay-first architecture.
+
+### What worked
+
+The final validation passed:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+```
+
+The server integration test passed and verified that workspace bootstrap returns an `automerge:` document URL and `ws://.../sync` metadata.
+
+### What didn't work
+
+TypeScript initially failed on cross-package build order and WebSocket adapter types:
+
+```text
+TS6305: Output file '.../packages/chat-core/dist/index.d.ts' has not been built from source file '.../packages/chat-core/src/index.ts'.
+```
+
+I fixed this by changing the root typecheck/build scripts to use `tsc -b` over packages in dependency order.
+
+The WebSocket adapter also produced a `@types/ws` constructor mismatch. I isolated the cast at adapter construction:
+
+```typescript
+new WebSocketServerAdapter(wss as never, 60_000)
+```
+
+This keeps the runtime object unchanged while avoiding a type-package incompatibility between the adapter’s expected `ws` type and the local import.
+
+### What I learned
+
+The official Automerge Repo server pattern maps cleanly to the app server, but TypeScript package-resolution and `ws` type compatibility need explicit handling in a monorepo prototype.
+
+### What was tricky to build
+
+The trickiest part was supporting both source-level tests and composite TypeScript builds. Package exports point at source for Vitest/tsx convenience, while root `tsc -b` provides build-order validation.
+
+### What warrants a second pair of eyes
+
+- The `wss as never` cast should be revisited once exact Automerge Repo WebSocket adapter type expectations are pinned.
+- The server currently uses `sharePolicy: async () => false`; future phases must decide how to bind peer identity to Keyhive authorization.
+- The bootstrap endpoint has no authentication yet.
+
+### What should be done in the future
+
+Wire the mock ACL adapter into server admission checks, then spike real Keyhive identity binding.
+
+### Code review instructions
+
+- Start with `packages/chat-server/src/app.ts`.
+- Then inspect `packages/chat-server/src/repo.ts` and `packages/chat-server/src/http/bootstrap.ts`.
+- Validate with:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+```
+
+### Technical details
+
+Primary files:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/config.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/repo.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts`
