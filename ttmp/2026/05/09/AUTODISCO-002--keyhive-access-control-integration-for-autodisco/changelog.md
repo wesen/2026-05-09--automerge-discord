@@ -115,3 +115,12 @@ Implemented durable experimental Keyhive persistence. `KeyhiveAccessControlAdapt
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — file-backed server snapshot wiring
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — invitation response mode now follows `config.aclMode`
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — server restart persistence test
+
+## 2026-05-09
+
+Added a dedicated `keyhive` devctl profile. The default `development` profile remains on mock ACLs, while `devctl up --profile keyhive` starts the same app with `ACL_MODE=keyhive-experimental` and `DATA_DIR=.devctl/data/autodisco-keyhive`. The devctl plugin now validates the patched local Keyhive package for experimental mode and reports ACL mode/data-directory details in its launch plan notes.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — added `keyhive` profile
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — ACL-mode env/defaults, validation, and launch notes

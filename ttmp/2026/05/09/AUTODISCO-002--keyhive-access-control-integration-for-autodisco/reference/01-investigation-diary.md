@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:20:00-04:00
+LastUpdated: 2026-05-09T16:36:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1194,3 +1194,55 @@ All validation passed.
 
 - The restored path is document-centric. Keyhive groups are recorded as admin target IDs, but the current WASM API exposes no public JavaScript `GroupId` constructor, so this implementation does not rehydrate `Group` objects for group-level membership mutation after restart.
 - The server snapshot is local JSON. It is adequate for the prototype, but a production deployment needs encrypted-at-rest storage, schema versioning, backup/recovery behavior, and potentially a multi-process locking strategy.
+
+## Step 15: Dedicated devctl Keyhive profile
+
+I added a separate devctl profile so the stable development mode can continue using mock ACLs while Keyhive experiments get their own explicit runtime mode and data directory.
+
+### Prompt Context
+
+**User prompt (verbatim):** "can we make a separate keyhive devctl profile?"
+
+**Assistant interpretation:** Add a named devctl profile that starts the same AUTODISCO services but sets `ACL_MODE=keyhive-experimental` and stores state separately from the default mock development run.
+
+### What changed
+
+- Updated `.devctl.yaml`:
+  - `development` now explicitly sets `ACL_MODE=mock` and keeps `DATA_DIR=.devctl/data/autodisco`.
+  - added `keyhive` profile with `ACL_MODE=keyhive-experimental` and `DATA_DIR=.devctl/data/autodisco-keyhive`.
+- Updated `devctl/autodisco-plugin.py`:
+  - added `DEFAULT_ACL_MODE=mock`;
+  - includes `ACL_MODE` in merged service env;
+  - includes `services.chat-server.acl_mode` in config metadata;
+  - validates that the local patched Keyhive package exists when `ACL_MODE=keyhive-experimental`;
+  - adds launch-plan notes for ACL mode, data directory, and the Keyhive snapshot file path in experimental mode.
+
+### How to use it
+
+```bash
+devctl up --profile keyhive --force --timeout 60s
+```
+
+The profile starts:
+
+- chat server on `http://localhost:3030`;
+- Vite web app on `http://localhost:5174`;
+- Storybook on `http://localhost:6006`.
+
+The Keyhive snapshot is written under:
+
+```text
+.devctl/data/autodisco-keyhive/keyhive-acl-snapshot.json
+```
+
+### Validation
+
+```bash
+python3 -m py_compile devctl/autodisco-plugin.py
+devctl profiles list
+devctl plugins list --profile keyhive
+devctl plan --profile keyhive --timeout 30s
+devctl up --profile keyhive --dry-run --timeout 30s --skip-build --skip-prepare
+```
+
+The dry-run launch plan correctly passed `ACL_MODE=keyhive-experimental` and the separate Keyhive data directory to the `chat-server` service.

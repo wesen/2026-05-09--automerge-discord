@@ -4,7 +4,7 @@ profile:
 profiles:
   development:
     display_name: Development
-    description: Run the AUTODISCO Automerge relay, Vite web client on :5174, and Storybook locally.
+    description: Run the AUTODISCO Automerge relay, Vite web client on :5174, and Storybook locally with mock ACLs.
     plugins:
       - autodisco
     env:
@@ -12,6 +12,19 @@ profiles:
       HOST: "127.0.0.1"
       PUBLIC_BASE_URL: "http://localhost:3030"
       DATA_DIR: ".devctl/data/autodisco"
+      ACL_MODE: "mock"
+
+  keyhive:
+    display_name: Keyhive Experimental
+    description: Run AUTODISCO with the experimental durable Keyhive ACL adapter and a separate data directory.
+    plugins:
+      - autodisco
+    env:
+      PORT: "3030"
+      HOST: "127.0.0.1"
+      PUBLIC_BASE_URL: "http://localhost:3030"
+      DATA_DIR: ".devctl/data/autodisco-keyhive"
+      ACL_MODE: "keyhive-experimental"
 
 plugins:
   - id: autodisco

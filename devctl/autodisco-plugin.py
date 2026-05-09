@@ -24,6 +24,7 @@ DEFAULT_PUBLIC_BASE_URL = "http://localhost:3030"
 DEFAULT_DATA_DIR = ".devctl/data/autodisco"
 DEFAULT_WEB_PORT = "5174"
 DEFAULT_STORYBOOK_PORT = "6006"
+DEFAULT_ACL_MODE = "mock"
 
 
 def emit(obj: dict[str, Any]) -> None:
@@ -59,6 +60,7 @@ def merged_env(config: dict[str, Any] | None = None) -> dict[str, str]:
         "HOST": DEFAULT_HOST,
         "PUBLIC_BASE_URL": DEFAULT_PUBLIC_BASE_URL,
         "DATA_DIR": DEFAULT_DATA_DIR,
+        "ACL_MODE": DEFAULT_ACL_MODE,
     }
     if config:
         config_env = config.get("env")
@@ -95,10 +97,12 @@ def handle_config_mutate(request_id: str) -> None:
                 "env.HOST": DEFAULT_HOST,
                 "env.PUBLIC_BASE_URL": DEFAULT_PUBLIC_BASE_URL,
                 "env.DATA_DIR": DEFAULT_DATA_DIR,
+                "env.ACL_MODE": DEFAULT_ACL_MODE,
                 "services.chat-server.port": DEFAULT_PORT,
                 "services.chat-server.url": DEFAULT_PUBLIC_BASE_URL,
                 "services.chat-server.health_url": f"{DEFAULT_PUBLIC_BASE_URL}/healthz",
                 "services.chat-server.sync_url": "ws://localhost:3030/sync",
+                "services.chat-server.acl_mode": DEFAULT_ACL_MODE,
                 "services.web.port": DEFAULT_WEB_PORT,
                 "services.web.url": "http://localhost:5174",
                 "services.storybook.port": DEFAULT_STORYBOOK_PORT,
@@ -109,8 +113,10 @@ def handle_config_mutate(request_id: str) -> None:
     })
 
 
-def handle_validate(request_id: str, ctx: dict[str, Any]) -> None:
+def handle_validate(request_id: str, ctx: dict[str, Any], input_obj: dict[str, Any]) -> None:
     root = repo_root(ctx)
+    config = input_obj.get("config") if isinstance(input_obj.get("config"), dict) else {}
+    env = merged_env(config)
     errors: list[dict[str, str]] = []
     warnings: list[dict[str, str]] = []
 
@@ -128,6 +134,12 @@ def handle_validate(request_id: str, ctx: dict[str, Any]) -> None:
     if not (root / "package-lock.json").exists():
         warnings.append({"code": "W_NO_LOCKFILE", "message": "package-lock.json not found; dependency versions may drift"})
 
+    if env.get("ACL_MODE") == "keyhive-experimental" and not (root / "vendor/keyhive-src/keyhive_wasm/pkg-node-patched/package.json").exists():
+        errors.append({
+            "code": "E_KEYHIVE_PATCHED_PACKAGE_MISSING",
+            "message": "keyhive profile requires vendor/keyhive-src/keyhive_wasm/pkg-node-patched; rebuild or restore the patched local Keyhive package",
+        })
+
     response_ok(request_id, {"valid": len(errors) == 0, "errors": errors, "warnings": warnings})
 
 
@@ -140,6 +152,7 @@ def handle_launch_plan(request_id: str, ctx: dict[str, Any], input_obj: dict[str
     port = env["PORT"]
     host = env["HOST"]
     public_base_url = env["PUBLIC_BASE_URL"]
+    acl_mode = env.get("ACL_MODE", DEFAULT_ACL_MODE)
     health_host = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
 
     if ctx.get("dry_run"):
@@ -176,6 +189,9 @@ def handle_launch_plan(request_id: str, ctx: dict[str, Any], input_obj: dict[str
         "notes": [
             f"HTTP API: {public_base_url}",
             f"Automerge sync: ws://localhost:{port}/sync",
+            f"ACL mode: {acl_mode}",
+            f"Data dir: {env['DATA_DIR']}",
+            *([f"Keyhive snapshot: {Path(env['DATA_DIR']) / 'keyhive-acl-snapshot.json'}"] if acl_mode == "keyhive-experimental" else []),
             "Vite web: http://localhost:5174",
             "Storybook: http://localhost:6006",
         ],
@@ -254,7 +270,7 @@ for raw_line in sys.stdin:
         if op == "config.mutate":
             handle_config_mutate(request_id)
         elif op == "validate.run":
-            handle_validate(request_id, ctx)
+            handle_validate(request_id, ctx, input_obj)
         elif op == "launch.plan":
             handle_launch_plan(request_id, ctx, input_obj)
         elif op == "command.run":

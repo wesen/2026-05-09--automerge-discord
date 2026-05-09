@@ -65,6 +65,7 @@
 - [x] Add tests gated for experimental mode.
 - [x] Add experimental adapter encrypt/decrypt helper coverage using the fixed package.
 - [x] Add server restart coverage for `ACL_MODE=keyhive-experimental` using `${DATA_DIR}/keyhive-acl-snapshot.json`.
+- [x] Add a dedicated `keyhive` devctl profile using `ACL_MODE=keyhive-experimental` and `.devctl/data/autodisco-keyhive`.
 
 ### Phase K7: Beelay/E2EE research
 
