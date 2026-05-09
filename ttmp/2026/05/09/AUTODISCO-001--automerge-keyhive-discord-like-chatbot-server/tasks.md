@@ -39,6 +39,8 @@
 - [x] Add placeholder invitation endpoint documenting that real Keyhive invitations are Phase 4.
 - [x] Add server integration test for workspace bootstrap.
 - [x] Validate with `npm run typecheck`, `npm run build`, and `npm test`.
+- [x] Add devctl setup for supervised local server runs.
+- [x] Validate devctl plugin discovery, planning, `up/status/bootstrap-workspace/down`, and `check` command.
 
 ### Phase 3: Mock ACL adapter
 

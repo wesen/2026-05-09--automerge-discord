@@ -13,6 +13,12 @@ DocType: reference
 Intent: long-term
 Owners: []
 RelatedFiles:
+    - Path: .devctl.yaml
+      Note: devctl repo configuration for the AUTODISCO development profile
+    - Path: .gitignore
+      Note: ignores devctl runtime state and local data artifacts
+    - Path: devctl/autodisco-plugin.py
+      Note: repo-local devctl protocol v2 plugin that plans and validates the chat server service
     - Path: package.json
       Note: Phase 0 workspace scaffold and validation scripts
     - Path: packages/chat-acl/src/index.ts
@@ -37,6 +43,7 @@ LastUpdated: 2026-05-09T12:48:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
+
 
 
 
@@ -784,3 +791,108 @@ Files introduced in the commit are under:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-client`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-bot-worker`
+
+## Step 10: Add devctl orchestration for running the prototype
+
+I added a repo-local devctl setup so the server can be started, health-checked, logged, stopped, and smoke-tested through one standard workflow. This converts the manual `npm run dev:server` command into a supervised `devctl up` service.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Run `devctl help --all` and create a devctl setup to run things"
+
+**Assistant interpretation:** Read the installed devctl help, then create a `.devctl.yaml` and plugin that can run the AUTODISCO prototype through devctl.
+
+**Inferred user intent:** The user wants a repeatable local developer workflow with process supervision instead of ad hoc terminal commands.
+
+### What I did
+
+- Ran `devctl help --all`.
+- Read the user, profiles, scripting, and plugin-authoring help pages relevant to repo-local plugin setup.
+- Added `.devctl.yaml` with an active `development` profile selecting the `autodisco` plugin.
+- Added `devctl/autodisco-plugin.py`, a protocol-v2 NDJSON plugin.
+- Implemented plugin ops:
+  - `config.mutate` for ports, URLs, and data directory config.
+  - `validate.run` for `node`, `npm`, expected package files, and `node_modules`.
+  - `launch.plan` for the supervised `chat-server` service.
+  - `command.run` for dynamic `check` and `bootstrap-workspace` helper commands.
+- Added `.devctl/` and `.autodisco-data/` to `.gitignore`.
+
+### Why
+
+The prototype is now meant to be run as a local development service. devctl gives us one workflow for plan/up/status/logs/down and keeps logs/state in `.devctl/`.
+
+### What worked
+
+Plugin discovery worked:
+
+```bash
+devctl plugins list --timeout 10s
+```
+
+Planning worked and returned one service:
+
+```bash
+devctl plan --timeout 10s
+```
+
+The full service loop worked:
+
+```bash
+devctl up --force --timeout 30s
+devctl status --tail-lines 5
+devctl bootstrap-workspace "Devctl Test Guild" --timeout 10s
+devctl down
+```
+
+The dynamic check command worked:
+
+```bash
+devctl check --timeout 120s
+```
+
+### What didn't work
+
+The first devctl-managed run created data directories under `packages/chat-server/` because `npm --workspace` lifecycle scripts run with the workspace package as current directory, so relative `DATA_DIR=.devctl/data/autodisco` was interpreted relative to `packages/chat-server`.
+
+I fixed this by resolving `DATA_DIR` to an absolute repo-root path inside `launch.plan` before returning the service environment.
+
+### What I learned
+
+When devctl launches an npm workspace script, service environment paths should be absolute if the service uses them as filesystem paths. Otherwise npm’s workspace lifecycle cwd can move relative paths away from the repo root.
+
+### What was tricky to build
+
+The important protocol invariant is that plugin stdout must remain NDJSON-only. The plugin sends all human-readable logs and subprocess output to stderr, including output from the dynamic `check` command.
+
+### What warrants a second pair of eyes
+
+- Confirm the dynamic command names (`check`, `bootstrap-workspace`) are the team’s preferred names.
+- Decide whether `devctl up` should run a build/prepare phase in the future or stay fast and only validate existing dependencies.
+- Review whether `DATA_DIR` should remain under `.devctl/data/autodisco` or move to a named project data directory.
+
+### What should be done in the future
+
+Add a frontend/client service to the launch plan once a browser UI exists.
+
+### Code review instructions
+
+- Start with `.devctl.yaml`.
+- Then inspect `devctl/autodisco-plugin.py`.
+- Validate with:
+
+```bash
+devctl plugins list --timeout 10s
+devctl plan --timeout 10s
+devctl up --force --timeout 30s
+devctl bootstrap-workspace "Devctl Test Guild" --timeout 10s
+devctl down
+devctl check --timeout 120s
+```
+
+### Technical details
+
+Primary files:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/.gitignore`

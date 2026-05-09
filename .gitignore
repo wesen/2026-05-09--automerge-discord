@@ -1,4 +1,6 @@
 node_modules/
+.devctl/
+.autodisco-data/
 dist/
 build/
 coverage/
@@ -8,3 +10,5 @@ coverage/
 *.log
 *.tsbuildinfo
 .DS_Store
+
+__pycache__/

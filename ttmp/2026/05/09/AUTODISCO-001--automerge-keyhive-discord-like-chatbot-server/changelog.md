@@ -29,8 +29,20 @@ Completed research package: captured sources, cloned vendor repos, added Automer
 
 Implemented Phases 0-2 and committed as 4994baf102c9c157a242dda7c8f55e00b85aa780.
 
+Added devctl setup with `.devctl.yaml`, repo-local NDJSON plugin, `chat-server` service plan, validation checks, and dynamic `check` / `bootstrap-workspace` commands.
+
 ### Related Files
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-core/src/mutations.ts — Phase 1 model
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — Phase 2 server
+
+
+## 2026-05-09
+
+Added devctl setup for supervised local server runs and dynamic check/bootstrap commands.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — devctl config
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — devctl plugin
 

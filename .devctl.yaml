@@ -1,0 +1,21 @@
+profile:
+  active: development
+
+profiles:
+  development:
+    display_name: Development
+    description: Run the AUTODISCO Automerge relay/app server locally.
+    plugins:
+      - autodisco
+    env:
+      PORT: "3030"
+      HOST: "127.0.0.1"
+      PUBLIC_BASE_URL: "http://localhost:3030"
+      DATA_DIR: ".devctl/data/autodisco"
+
+plugins:
+  - id: autodisco
+    path: python3
+    args:
+      - ./devctl/autodisco-plugin.py
+    priority: 10
