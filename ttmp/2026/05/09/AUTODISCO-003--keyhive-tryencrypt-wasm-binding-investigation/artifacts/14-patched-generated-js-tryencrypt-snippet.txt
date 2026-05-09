@@ -1,0 +1,32 @@
+2084-     * @param {ChangeId[]} js_pred_refs
+2085-     * @param {Uint8Array} content
+2086-     * @returns {Promise<EncryptedContentWithUpdate>}
+2087-     */
+2088:    tryEncrypt(doc, content_ref, js_pred_refs, content) {
+2089-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+2090-        _assertNum(this.__wbg_ptr);
+2091-        _assertClass(doc, Document);
+2092-        if (doc.__wbg_ptr === 0) {
+2093-            throw new Error('Attempt to use a moved value');
+2094-        }
+2095-        _assertClass(content_ref, ChangeId);
+2096-        if (content_ref.__wbg_ptr === 0) {
+2097-            throw new Error('Attempt to use a moved value');
+2098-        }
+2099-        const ptr0 = passArrayJsValueToWasm0(js_pred_refs, wasm.__wbindgen_malloc);
+2100-        const len0 = WASM_VECTOR_LEN;
+2101-        const ptr1 = passArray8ToWasm0(content, wasm.__wbindgen_malloc);
+2102-        const len1 = WASM_VECTOR_LEN;
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArray8ToWasm0(content, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.keyhive_tryEncrypt(this.__wbg_ptr, doc.__wbg_ptr, content_ref.__wbg_ptr, ptr0, len0, ptr1, len1);
+        return ret;
+    }
+    /**
+     * @param {Document} doc
+     * @param {ChangeId} content_ref
+     * @param {ChangeId[]} pred_refs
+     * @param {Uint8Array} content
+     * @returns {Promise<EncryptedContentWithUpdate>}
+     */

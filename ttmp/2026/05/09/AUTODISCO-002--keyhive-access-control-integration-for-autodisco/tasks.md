@@ -53,7 +53,7 @@
 - [x] Prove group/document creation.
 - [x] Prove addMember/revokeMember.
 - [x] Prove event export and archive serialization.
-- [ ] Prove encrypt/decrypt for authorized peer. Blocked: `tryEncrypt` currently throws `null pointer passed to rust` in the Node spike; recorded under scripts/03 and diary.
+- [x] Prove encrypt/decrypt for authorized peer using the locally fixed Keyhive WASM package from repo-root `vendor/keyhive-src/keyhive_wasm/pkg-node-patched`.
 - [x] Record exact package version, build settings, failures, and API gaps in diary.
 
 ### Phase K6: Experimental Keyhive adapter
@@ -63,6 +63,7 @@
 - [ ] Persist/load Keyhive archive state. Partial: adapter can export archive bytes, but durable signing-key/archive reload is not wired yet.
 - [x] Convert membership events to/from JSON-safe base64 arrays.
 - [x] Add tests gated for experimental mode.
+- [x] Add experimental adapter encrypt/decrypt helper coverage using the fixed package.
 
 ### Phase K7: Beelay/E2EE research
 

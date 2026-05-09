@@ -28,6 +28,19 @@ describe('KeyhiveAccessControlAdapter experimental mode', () => {
     await expect(owner.revoke(agent, { id: workspace.workspaceDocumentId, kind: 'document' })).resolves.toBeUndefined()
   })
 
+  it('encrypts and decrypts document content through the experimental adapter', async () => {
+    const acl = new KeyhiveAccessControlAdapter()
+    const workspace = await acl.createWorkspace('Encrypted Guild')
+    const encrypted = await acl.encryptContentForDocument(
+      workspace.workspaceDocumentId,
+      new Uint8Array([13, 14, 15]),
+      [new Uint8Array([10, 11, 12])],
+      new TextEncoder().encode('hello from adapter'),
+    )
+    const plaintext = await acl.decryptContentForDocument(workspace.workspaceDocumentId, encrypted)
+    expect(new TextDecoder().decode(plaintext)).toBe('hello from adapter')
+  })
+
   it('denies admin checks for unknown targets', async () => {
     const acl = new KeyhiveAccessControlAdapter()
     await expect(acl.assertCanAdmin('doc:unknown')).rejects.toBeInstanceOf(ForbiddenError)

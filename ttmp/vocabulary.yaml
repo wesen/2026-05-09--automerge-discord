@@ -23,6 +23,14 @@ topics:
       description: Invitation, join, contact-card, and member onboarding flows.
     - slug: local-first
       description: Local-first software, offline-capable sync, and peer-owned state.
+    - slug: wasm
+      description: WebAssembly and wasm-bindgen integration details
+    - slug: bug-report
+      description: Bug reports and upstream issue preparation
+    - slug: rust
+      description: Rust language and Cargo implementation work
+    - slug: encryption
+      description: Encryption and decryption implementation details
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes
@@ -41,6 +49,8 @@ intent:
       description: Short-term documentation for active work
     - slug: throwaway
       description: Temporary/experimental documentation
+    - slug: implementation-guide
+      description: Implementation-oriented long-form guide
 status:
     - slug: draft
       description: Initial draft state

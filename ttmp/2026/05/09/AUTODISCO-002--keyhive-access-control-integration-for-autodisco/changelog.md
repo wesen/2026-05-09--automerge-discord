@@ -92,3 +92,14 @@ Wrote two long-form Obsidian project reports and copied them into the ticket: on
 - /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md — Obsidian project report for the Keyhive architecture
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/01-PROJ - AUTODISCO - Automerge Discord App Architecture.md — ticket-local copy
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md — ticket-local copy
+
+## 2026-05-09
+
+Resumed AUTODISCO-002 using the locally fixed Keyhive package from repo-root `vendor/keyhive-src/keyhive_wasm/pkg-node-patched`. `@autodisco/chat-acl` now depends on the patched local package, real Keyhive encrypt/decrypt is covered in the spike test, and `KeyhiveAccessControlAdapter` has experimental document-content encrypt/decrypt helpers with passing test coverage.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/package.json — points `@keyhive/keyhive` at the fixed local package
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — experimental encrypt/decrypt helpers
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-spike.test.ts — real Keyhive encrypt/decrypt proof
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts — adapter encrypt/decrypt proof

@@ -252,6 +252,24 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     return (await (await this.keyhive()).contactCard()).toJson()
   }
 
+  async encryptContentForDocument(documentId: string, contentRef: Uint8Array, predRefs: Uint8Array[], content: Uint8Array): Promise<KeyhiveWasm.Encrypted> {
+    const doc = this.#documents.get(documentId)
+    if (!doc) throw new ForbiddenError(`unknown Keyhive document ${documentId}`)
+    const encrypted = await (await this.keyhive()).tryEncrypt(
+      doc,
+      new KeyhiveWasm.ChangeId(contentRef),
+      predRefs.map((predRef) => new KeyhiveWasm.ChangeId(predRef)),
+      content,
+    )
+    return encrypted.encrypted_content()
+  }
+
+  async decryptContentForDocument(documentId: string, encrypted: KeyhiveWasm.Encrypted): Promise<Uint8Array> {
+    const doc = this.#documents.get(documentId)
+    if (!doc) throw new ForbiddenError(`unknown Keyhive document ${documentId}`)
+    return await (await this.keyhive()).tryDecrypt(doc, encrypted)
+  }
+
   private keyhive(): Promise<KeyhiveWasm.Keyhive> {
     this.#keyhive ??= KeyhiveWasm.Keyhive.init(this.#signer.clone(), this.#ciphertextStore, (event: unknown) => {
       if (event && typeof event === 'object' && 'toBytes' in event && typeof event.toBytes === 'function') {

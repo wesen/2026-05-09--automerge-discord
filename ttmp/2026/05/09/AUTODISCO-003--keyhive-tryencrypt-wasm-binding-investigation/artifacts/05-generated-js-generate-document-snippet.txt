@@ -1,0 +1,41 @@
+1487-        return ret;
+1488-    }
+1489-    /**
+1490-     * @param {Peer[]} coparents
+1491-     * @param {ChangeId} initial_content_ref_head
+1492-     * @param {ChangeId[]} more_initial_content_refs
+1493-     * @returns {Promise<Document>}
+1494-     */
+1495:    generateDocument(coparents, initial_content_ref_head, more_initial_content_refs) {
+1496-        const ptr0 = passArrayJsValueToWasm0(coparents, wasm.__wbindgen_malloc);
+1497-        const len0 = WASM_VECTOR_LEN;
+1498-        _assertClass(initial_content_ref_head, ChangeId);
+1499-        var ptr1 = initial_content_ref_head.__destroy_into_raw();
+1500-        const ptr2 = passArrayJsValueToWasm0(more_initial_content_refs, wasm.__wbindgen_malloc);
+1501-        const len2 = WASM_VECTOR_LEN;
+1502:        const ret = wasm.keyhive_generateDocument(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, len2);
+1503-        return ret;
+1504-    }
+1505-    /**
+1506-     * @param {Peer[]} js_coparents
+1507-     * @returns {Promise<Group>}
+1508-     */
+1509-    generateGroup(js_coparents) {
+1510-        const ptr0 = passArrayJsValueToWasm0(js_coparents, wasm.__wbindgen_malloc);
+1511-        const len0 = WASM_VECTOR_LEN;
+1512-        const ret = wasm.keyhive_generateGroup(this.__wbg_ptr, ptr0, len0);
+1513-        return ret;
+1514-    }
+1515-    /**
+1516-     * @param {Identifier} id
+1517-     * @returns {Promise<Agent | undefined>}
+1518-     */
+1519-    getAgent(id) {
+1520-        _assertClass(id, Identifier);
+1521-        const ret = wasm.keyhive_getAgent(this.__wbg_ptr, id.__wbg_ptr);
+1522-        return ret;
+1523-    }
+1524-    /**
+1525-     * @param {DocumentId} doc_id
+1526-     * @returns {Promise<Document | undefined>}
+1527-     */

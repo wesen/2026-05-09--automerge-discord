@@ -1,4 +1,5 @@
 node_modules/
+vendor/keyhive-src/
 .devctl/
 .autodisco-data/
 dist/

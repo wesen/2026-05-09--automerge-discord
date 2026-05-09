@@ -1,0 +1,24 @@
+diff --git a/keyhive_wasm/src/js/keyhive.rs b/keyhive_wasm/src/js/keyhive.rs
+index b006761..66d348d 100644
+--- a/keyhive_wasm/src/js/keyhive.rs
++++ b/keyhive_wasm/src/js/keyhive.rs
+@@ -174,8 +174,8 @@ impl JsKeyhive {
+     #[wasm_bindgen(js_name = tryEncrypt)]
+     pub async fn try_encrypt(
+         &self,
+-        doc: JsDocument,
+-        content_ref: JsChangeId,
++        doc: &JsDocument,
++        content_ref: &JsChangeId,
+         js_pred_refs: Vec<JsChangeIdRef>,
+         content: &[u8],
+     ) -> Result<JsEncryptedContentWithUpdate, JsEncryptError> {
+@@ -187,7 +187,7 @@ impl JsKeyhive {
+ 
+         Ok(self
+             .0
+-            .try_encrypt_content(doc.inner, &content_ref, &pred_refs, content)
++            .try_encrypt_content(doc.inner.dupe(), content_ref, &pred_refs, content)
+             .await?
+             .into())
+     }

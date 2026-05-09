@@ -1,0 +1,2203 @@
+{
+  "node": "v22.22.1",
+  "platform": "linux",
+  "package": {
+    "name": "@keyhive/keyhive",
+    "version": "0.0.0-alpha.56c"
+  },
+  "summary": {
+    "total": 48,
+    "pass": 16,
+    "fail": 32,
+    "byStage": {
+      "uncaughtException": 32,
+      "complete": 16
+    }
+  },
+  "results": [
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=3 pred=none",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=3 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=3 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=3 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=3 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=32 pred=none",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=32 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=32 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=32 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=false init=32 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=false init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=false archive=true init=3 pred=none",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x303468257b0cd95b36d0a46787317fbac623f8ce6ecffdc7d080382950ca1f7c",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=false archive=true init=3 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=false archive=true init=3 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xf136a9547b0fed0d702372401b6cef293b5763416cdd3ad483203f8b7876df4c",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=false archive=true init=3 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=true init=3 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=true init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=false archive=true init=32 pred=none",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xb21458080101cce3baabaa5221b25827d9d4ac5e60bc25a1760736b1f5e8e774",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=false archive=true init=32 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=false archive=true init=32 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x30b3bb4de0eea09c87145364b44e49b12eabdf0e718b4cd0f81cd0e97cab2f9b",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=false archive=true init=32 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=false archive=true init=32 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=false archive=true init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=3 pred=none",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=3 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=3 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=3 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=3 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=32 pred=none",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=32 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=32 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=32 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=false init=32 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=false init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=true archive=true init=3 pred=none",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x39540e5bc3f3223a23adb36061cf9e67da1018db659912728c42a19068ff946b",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=true archive=true init=3 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=true archive=true init=3 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xdeff0502b05138b15a7c266a8f12b4e2045e4b19f72fa1e1875f71df576330d5",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=true archive=true init=3 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=true init=3 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=true init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=true archive=true init=32 pred=none",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x169bd35d278d5f9358961ab19891bbb0a1c8ccfc2eb9ba5fc3879f0978877376",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=true archive=true init=32 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=false group=true archive=true init=32 pred=fresh",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x19fa7c00f19ac579730f90d437e1b736b3ac7d5ea8edd683ce36526f627e072e",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=false group=true archive=true init=32 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=false group=true archive=true init=32 pred=initial",
+        "expandPrekeys": false,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=false group=true archive=true init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=3 pred=none",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=3 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=3 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=3 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=3 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=32 pred=none",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=32 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=32 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=32 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=false init=32 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=false init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=false archive=true init=3 pred=none",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xfdbdc695d65ce196f5749eae1a35d95b1cf9f88f1e77c52a897b8df4806ca5a3",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=false archive=true init=3 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=false archive=true init=3 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x162298250b8bcc377905d3ee6a6faa08e6fecf593f520768fe68f715b02e7f59",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=false archive=true init=3 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=true init=3 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=true init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=false archive=true init=32 pred=none",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x72362a4e11b7ee76611441f683ba5f676417cbeaa21763f59605d81a396cba00",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=false archive=true init=32 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=false archive=true init=32 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x098e2fd39e476cb66808a2f0f8e74736c6996e950c55eb84eec9a9cacea3cad1",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=false archive=true init=32 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=false archive=true init=32 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": false,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=false archive=true init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=3 pred=none",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=3 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=3 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=3 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=3 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=32 pred=none",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=32 pred=none",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=32 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+          "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+          "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+          "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)",
+          "    at real (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3404:20)"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=32 pred=fresh",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=false init=32 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": false,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[223]:0xae2a6",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=false init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=true archive=true init=3 pred=none",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xf271f95d76a28cafcc5b9a1772773c601c1cf26fa50d18e0cbf30c3093f74328",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=true archive=true init=3 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=true archive=true init=3 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xef2c0d1a15a62921cfcedfb4dcfa6970d3c01571154df3f0f6a62620f723b455",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=true archive=true init=3 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=true init=3 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": [
+          1,
+          2,
+          3
+        ],
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=true init=3 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=true archive=true init=32 pred=none",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "none",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0xb152ba983c7fc672d80c4848dd1b1b7e5a14eda8032afae54bf7d65998bc14d5",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=true archive=true init=32 pred=none",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "spec": {
+        "name": "expand=true group=true archive=true init=32 pred=fresh",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "fresh",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "docId": "0x2d90008826c40469d800855db4f8435c2be9e352fd113bda202256e56373f477",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "eventVariants": [
+        "PREKEYS_EXPANDED",
+        "DELEGATED",
+        "DELEGATED",
+        "DELEGATED",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION",
+        "CGKA_OPERATION"
+      ],
+      "name": "expand=true group=true archive=true init=32 pred=fresh",
+      "exitCode": 0,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "spec": {
+        "name": "expand=true group=true archive=true init=32 pred=initial",
+        "expandPrekeys": true,
+        "withGroup": true,
+        "archive": true,
+        "initialBytes": 32,
+        "contentBytes": [
+          13,
+          14,
+          15
+        ],
+        "predRefs": "initial",
+        "predBytes": [
+          10,
+          11,
+          12
+        ]
+      },
+      "error": {
+        "name": "Error",
+        "message": "null pointer passed to rust",
+        "stack": [
+          "Error: null pointer passed to rust",
+          "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+          "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+          "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+          "    at wasm://wasm/0075a546:wasm-function[949]:0x16ed85",
+          "    at ChangeId.__wasm_refgen_toJsChangeId (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:422:26)",
+          "    at __wbg___wasm_refgen_toJsChangeId_6ccc69ca295f07d8 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2576:30)",
+          "    at wasm://wasm/0075a546:wasm-function[963]:0x16ff2d",
+          "    at wasm://wasm/0075a546:wasm-function[222]:0xad949",
+          "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+          "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae"
+        ],
+        "text": "Error: null pointer passed to rust"
+      },
+      "name": "expand=true group=true archive=true init=32 pred=initial",
+      "exitCode": 41,
+      "signal": null,
+      "stderr": [
+        ""
+      ]
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "node": "v22.22.1",
+  "results": [
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "name": "tryEncrypt-direct-doc-direct-content-empty-preds",
+      "message": "null pointer passed to rust",
+      "stack": [
+        "Error: null pointer passed to rust",
+        "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+        "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+        "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+        "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+        "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+        "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+        "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+        "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+        "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)"
+      ],
+      "exitCode": 31,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncrypt-ref-doc-direct-content-empty-preds",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": false,
+      "stage": "uncaughtException",
+      "name": "tryEncrypt-direct-doc-ref-content-empty-preds",
+      "message": "null pointer passed to rust",
+      "stack": [
+        "Error: null pointer passed to rust",
+        "    at __wbg___wbindgen_throw_81fc77679af83bc6 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:2618:19)",
+        "    at wasm://wasm/0075a546:wasm-function[2274]:0x1b4fe9",
+        "    at wasm://wasm/0075a546:wasm-function[2275]:0x1b4ff6",
+        "    at wasm://wasm/0075a546:wasm-function[270]:0xc5408",
+        "    at wasm://wasm/0075a546:wasm-function[773]:0x153c59",
+        "    at wasm://wasm/0075a546:wasm-function[2000]:0x1af4ae",
+        "    at wasm://wasm/0075a546:wasm-function[1706]:0x19a87b",
+        "    at wasm://wasm/0075a546:wasm-function[1956]:0x1abc70",
+        "    at wasm_bindgen__convert__closures_____invoke__h3280982d348b8ce7 (/home/manuel/code/wesen/2026-05-09--automerge-discord/node_modules/@keyhive/keyhive/pkg-node/keyhive_wasm.js:3131:22)"
+      ],
+      "exitCode": 31,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncrypt-ref-doc-ref-content-empty-preds",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncryptArchive-direct-doc-direct-content-empty-preds",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncryptArchive-ref-doc-direct-content-empty-preds",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncryptArchive-direct-doc-ref-content-empty-preds",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncryptArchive-direct-doc-direct-content-ref-pred-fresh-direct",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    },
+    {
+      "ok": true,
+      "stage": "complete",
+      "name": "tryEncryptArchive-direct-doc-direct-content-ref-pred-fresh-ref",
+      "decrypted": "hello",
+      "encryptedBytes": 21,
+      "exitCode": 0,
+      "stderr": [
+        ""
+      ]
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "pass": 7,
+    "fail": 2
+  }
+}

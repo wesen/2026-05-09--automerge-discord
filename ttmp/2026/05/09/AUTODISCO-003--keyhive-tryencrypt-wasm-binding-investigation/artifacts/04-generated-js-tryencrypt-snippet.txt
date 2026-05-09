@@ -1,0 +1,82 @@
+1719-        const ret = wasm.keyhive_tryDecrypt(this.__wbg_ptr, doc.__wbg_ptr, encrypted.__wbg_ptr);
+1720-        return ret;
+1721-    }
+1722-    /**
+1723-     * @param {Document} doc
+1724-     * @param {ChangeId} content_ref
+1725-     * @param {ChangeId[]} js_pred_refs
+1726-     * @param {Uint8Array} content
+1727-     * @returns {Promise<EncryptedContentWithUpdate>}
+1728-     */
+1729:    tryEncrypt(doc, content_ref, js_pred_refs, content) {
+1730-        _assertClass(doc, Document);
+1731-        var ptr0 = doc.__destroy_into_raw();
+1732-        _assertClass(content_ref, ChangeId);
+1733-        var ptr1 = content_ref.__destroy_into_raw();
+1734-        const ptr2 = passArrayJsValueToWasm0(js_pred_refs, wasm.__wbindgen_malloc);
+1735-        const len2 = WASM_VECTOR_LEN;
+1736-        const ptr3 = passArray8ToWasm0(content, wasm.__wbindgen_malloc);
+1737-        const len3 = WASM_VECTOR_LEN;
+1738:        const ret = wasm.keyhive_tryEncrypt(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+1739-        return ret;
+1740-    }
+1741-    /**
+1742-     * @param {Document} doc
+1743-     * @param {ChangeId} content_ref
+1744-     * @param {ChangeId[]} pred_refs
+1745-     * @param {Uint8Array} content
+1746-     * @returns {Promise<EncryptedContentWithUpdate>}
+1747-     */
+1748:    tryEncryptArchive(doc, content_ref, pred_refs, content) {
+1749-        _assertClass(doc, Document);
+1750-        _assertClass(content_ref, ChangeId);
+1751-        const ptr0 = passArrayJsValueToWasm0(pred_refs, wasm.__wbindgen_malloc);
+1752-        const len0 = WASM_VECTOR_LEN;
+1753-        const ptr1 = passArray8ToWasm0(content, wasm.__wbindgen_malloc);
+1754-        const len1 = WASM_VECTOR_LEN;
+1755:        const ret = wasm.keyhive_tryEncryptArchive(this.__wbg_ptr, doc.__wbg_ptr, content_ref.__wbg_ptr, ptr0, len0, ptr1, len1);
+1756-        return ret;
+1757-    }
+1758-    /**
+1759-     * @param {Uint8Array} data
+1760-     * @returns {Promise<Signed>}
+1761-     */
+1762-    trySign(data) {
+1763-        const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
+1764-        const len0 = WASM_VECTOR_LEN;
+1765-        const ret = wasm.keyhive_trySign(this.__wbg_ptr, ptr0, len0);
+1766-        return ret;
+1767-    }
+1768-    /**
+1769-     * @returns {IndividualId}
+1770-     */
+1771-    get whoami() {
+1772-        const ret = wasm.keyhive_whoami(this.__wbg_ptr);
+1773-        return IndividualId.__wrap(ret);
+1774-    }
+1775-}
+1776-if (Symbol.dispose) Keyhive.prototype[Symbol.dispose] = Keyhive.prototype.free;
+1777-exports.Keyhive = Keyhive;
+1778-
+1779-class Membered {
+1780-    static __wrap(ptr) {
+1781-        ptr = ptr >>> 0;
+1782-        const obj = Object.create(Membered.prototype);
+1783-        obj.__wbg_ptr = ptr;
+1784-        MemberedFinalization.register(obj, obj.__wbg_ptr, obj);
+1785-        return obj;
+1786-    }
+1787-    __destroy_into_raw() {
+1788-        const ptr = this.__wbg_ptr;
+1789-        this.__wbg_ptr = 0;
+1790-        MemberedFinalization.unregister(this);
+1791-        return ptr;
+1792-    }
+1793-    free() {
+1794-        const ptr = this.__destroy_into_raw();
+1795-        wasm.__wbg_membered_free(ptr, 0);
+1796-    }
+1797-}
+1798-if (Symbol.dispose) Membered.prototype[Symbol.dispose] = Membered.prototype.free;
+1799-exports.Membered = Membered;
+1800-

@@ -12,3 +12,6 @@ sources/
 2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/vendor/**
 2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/sources/
 2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/sources/**
+# AUTODISCO-003 stores a cloned upstream Keyhive repo for source inspection and local build verification.
+2026/05/09/AUTODISCO-003--keyhive-tryencrypt-wasm-binding-investigation/vendor/
+2026/05/09/AUTODISCO-003--keyhive-tryencrypt-wasm-binding-investigation/vendor/**

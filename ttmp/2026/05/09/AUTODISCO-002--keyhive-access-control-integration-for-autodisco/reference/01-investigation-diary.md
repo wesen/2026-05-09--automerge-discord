@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T15:08:00-04:00
+LastUpdated: 2026-05-09T16:12:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1091,3 +1091,44 @@ docmgr doctor --ticket AUTODISCO-002 --stale-after 30
 ```
 
 The doctor check passed after adding numeric prefixes to the ticket-local copies.
+
+## Step 13: Resume AUTODISCO-002 with the locally fixed Keyhive package
+
+After AUTODISCO-003 isolated and locally fixed the Keyhive `tryEncrypt` WASM binding bug, I resumed AUTODISCO-002 by switching `@autodisco/chat-acl` to use the patched local Keyhive package and adding encryption/decryption coverage.
+
+### Prompt Context
+
+**User prompt (verbatim):** "can we continue with AUTODISCO-002 now, using the fixed package?"
+
+**Assistant interpretation:** Continue the Keyhive integration work by consuming the locally rebuilt fixed package rather than the published npm package, then prove the previously blocked encrypt/decrypt path.
+
+### What changed
+
+- Moved the upstream Keyhive source clone out of the ticket and into repo-root `vendor/keyhive-src` per the user's instruction.
+- Added `vendor/keyhive-src/` to `.gitignore` so the third-party clone and rebuilt WASM artifacts are available locally without being committed as repository source.
+- Updated `@autodisco/chat-acl` to depend on the patched local package:
+
+```json
+"@keyhive/keyhive": "file:../../vendor/keyhive-src/keyhive_wasm/pkg-node-patched"
+```
+
+- Added a real Keyhive encryption/decryption spike test to `packages/chat-acl/test/keyhive-spike.test.ts`.
+- Added experimental adapter methods:
+  - `encryptContentForDocument(documentId, contentRef, predRefs, content)`
+  - `decryptContentForDocument(documentId, encrypted)`
+- Added adapter coverage in `packages/chat-acl/test/keyhive-adapter.test.ts` proving `KeyhiveAccessControlAdapter` can encrypt and decrypt content for a created workspace document.
+- Marked the K5 encrypt/decrypt task complete and added K6 adapter encrypt/decrypt coverage as complete.
+
+### Validation
+
+```bash
+node ttmp/2026/05/09/AUTODISCO-003--keyhive-tryencrypt-wasm-binding-investigation/scripts/09-keyhive-tryencrypt-patched-local-repro.mjs
+npm run typecheck
+npm --workspace @autodisco/chat-acl test
+```
+
+The patched local repro printed `hello`. Typecheck passed. The `@autodisco/chat-acl` test suite now has 8 passing tests, including real Keyhive encrypt/decrypt and adapter encrypt/decrypt.
+
+### Remaining limitation
+
+This uses a local patched package from `vendor/keyhive-src/keyhive_wasm/pkg-node-patched`, not an upstream-published package. The next production-quality step is still to upstream the Rust binding fix and then return to a normal npm dependency.
