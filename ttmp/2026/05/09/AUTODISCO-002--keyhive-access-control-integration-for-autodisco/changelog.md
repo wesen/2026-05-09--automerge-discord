@@ -146,3 +146,12 @@ Fixed AUTODISCO web panel overflow and join-link paste behavior. Long Keyhive/Au
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/index.css — panel overflow/wrapping fixes
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/OpenWorkspaceForm/OpenWorkspaceForm.tsx — parse pasted join links and auto-fill relay URL
+
+## 2026-05-09
+
+Made copied Keyhive contact cards more understandable. The web UI now wraps the raw Keyhive `Rotate` contact-card JSON in an `autodisco.contact-card.v1` envelope with `mode: keyhive-experimental`, agent metadata, and `keyhiveContactCardJson` containing the opaque raw Keyhive card.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — Keyhive contact-card envelope copy behavior
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx — helper text for Keyhive contact-card envelope

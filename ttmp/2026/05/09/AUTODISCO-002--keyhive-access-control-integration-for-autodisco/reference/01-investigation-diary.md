@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:50:00-04:00
+LastUpdated: 2026-05-09T16:56:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1326,3 +1326,32 @@ npm run build
 ```
 
 I also inspected the running Keyhive profile at a narrow viewport using Playwright. The left panel switched to the one-column responsive layout, the identity card showed `keyhive-experimental`, and long Keyhive identifiers wrapped inside the panel instead of overflowing.
+
+## Step 18: Wrap copied Keyhive contact cards in an AUTODISCO envelope
+
+The Keyhive contact-card copy button was technically copying a valid raw Keyhive contact card, but the payload was an opaque object such as `{ "Rotate": ... }`. That is valid for `ContactCard.fromJson(...)`, but it is confusing in the AUTODISCO UI and does not identify the payload as an AUTODISCO contact card.
+
+### Prompt Context
+
+**User prompt (verbatim):** the user pasted the copied contact card showing a raw Keyhive `Rotate` object.
+
+**Assistant interpretation:** Keep the raw Keyhive card intact for backend parsing, but copy a clearer AUTODISCO envelope around it.
+
+### What changed
+
+- Updated the web `Copy Contact Card` behavior in Keyhive mode to copy an envelope:
+  - `kind: autodisco.contact-card.v1`
+  - `mode: keyhive-experimental`
+  - `agent.id: keyhive:...`
+  - `publicKeyFingerprint`
+  - `keyhiveContactCardJson`, containing the raw opaque Keyhive `Rotate` payload string
+  - `createdAt`
+- Kept backend compatibility because `parseKeyhiveContactCardJson(...)` already accepts objects with `keyhiveContactCardJson`.
+- Added invitation-form helper text explaining that Keyhive-mode contact cards contain an opaque Keyhive card under `keyhiveContactCardJson`.
+
+### Validation
+
+```bash
+npm run typecheck
+npm --workspace @autodisco/chat-web run build
+```

@@ -104,7 +104,7 @@ export function HomePageContent() {
 
   async function copyContactCard() {
     try {
-      const contactCard = bootstrapStatus?.contactCardJson ?? stringifyContactCard(identity)
+      const contactCard = stringifyRuntimeContactCard(aclMode, identity, bootstrapStatus)
       await copyToClipboard(contactCard)
       appendLog('ok', `Copied ${aclMode} contact card`, aclMode === 'keyhive-experimental' ? bootstrapStatus?.localMemberId : identity.memberId)
     } catch (error) {
@@ -236,6 +236,27 @@ function buildJoinUrl(workspace?: ActiveWorkspace): string | undefined {
   url.searchParams.set('sync', workspace.syncUrl)
   url.searchParams.set('label', workspace.label)
   return url.toString()
+}
+
+function stringifyRuntimeContactCard(
+  aclMode: 'mock' | 'keyhive-experimental',
+  identity: ReturnType<typeof getLocalIdentity>,
+  bootstrapStatus?: { localMemberId: string; publicKeyFingerprint: string; contactCardJson: string },
+): string {
+  if (aclMode !== 'keyhive-experimental' || !bootstrapStatus) return stringifyContactCard(identity)
+  return JSON.stringify(
+    {
+      kind: 'autodisco.contact-card.v1',
+      mode: 'keyhive-experimental',
+      displayName: 'Server Keyhive Identity',
+      agent: { id: bootstrapStatus.localMemberId, kind: 'individual' },
+      publicKeyFingerprint: bootstrapStatus.publicKeyFingerprint,
+      keyhiveContactCardJson: bootstrapStatus.contactCardJson,
+      createdAt: new Date().toISOString(),
+    },
+    null,
+    2,
+  )
 }
 
 async function copyToClipboard(value: string): Promise<void> {
