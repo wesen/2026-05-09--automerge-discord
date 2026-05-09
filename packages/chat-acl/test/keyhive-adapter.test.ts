@@ -28,6 +28,39 @@ describe('KeyhiveAccessControlAdapter experimental mode', () => {
     await expect(owner.revoke(agent, { id: workspace.workspaceDocumentId, kind: 'document' })).resolves.toBeUndefined()
   })
 
+  it('restores signing identity, archive state, known documents, and admin targets from a snapshot', async () => {
+    const first = new KeyhiveAccessControlAdapter()
+    const workspace = await first.createWorkspace('Durable Guild')
+    const firstMemberId = first.localMemberId()
+    const firstPublicKey = Array.from(first.localPublicKey())
+    const snapshot = await first.exportSnapshot()
+
+    const restored = new KeyhiveAccessControlAdapter({ snapshot })
+    expect(restored.localMemberId()).toBe(firstMemberId)
+    expect(Array.from(restored.localPublicKey())).toEqual(firstPublicKey)
+    await expect(restored.assertCanAdmin(workspace.workspaceDocumentId)).resolves.toBeUndefined()
+
+    const encrypted = await restored.encryptContentForDocument(
+      workspace.workspaceDocumentId,
+      new Uint8Array([21, 22, 23]),
+      [new Uint8Array([18, 19, 20])],
+      new TextEncoder().encode('hello after restore'),
+    )
+    const plaintext = await restored.decryptContentForDocument(workspace.workspaceDocumentId, encrypted)
+    expect(new TextDecoder().decode(plaintext)).toBe('hello after restore')
+  })
+
+  it('persists snapshots through the onSnapshot callback after mutations', async () => {
+    let latestSnapshot: Awaited<ReturnType<KeyhiveAccessControlAdapter['exportSnapshot']>> | undefined
+    const acl = new KeyhiveAccessControlAdapter({ onSnapshot: (snapshot) => (latestSnapshot = snapshot) })
+    const workspace = await acl.createWorkspace('Callback Guild')
+
+    expect(latestSnapshot?.signingKeyBytes).toHaveLength(32)
+    expect(latestSnapshot?.archiveBytes?.length).toBeGreaterThan(0)
+    expect(latestSnapshot?.documentIds).toContain(workspace.workspaceDocumentId)
+    expect(latestSnapshot?.adminTargets).toContain(workspace.workspaceDocumentId)
+  })
+
   it('encrypts and decrypts document content through the experimental adapter', async () => {
     const acl = new KeyhiveAccessControlAdapter()
     const workspace = await acl.createWorkspace('Encrypted Guild')

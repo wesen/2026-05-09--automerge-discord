@@ -60,10 +60,11 @@
 
 - [x] Implement `KeyhiveAccessControlAdapter` behind the existing interface.
 - [x] Add `ACL_MODE=mock|keyhive-experimental` selection.
-- [ ] Persist/load Keyhive archive state. Partial: adapter can export archive bytes, but durable signing-key/archive reload is not wired yet.
+- [x] Persist/load Keyhive archive state, memory signing key bytes, prekey secret bytes, known document IDs, known agent IDs, and admin target IDs through a JSON snapshot.
 - [x] Convert membership events to/from JSON-safe base64 arrays.
 - [x] Add tests gated for experimental mode.
 - [x] Add experimental adapter encrypt/decrypt helper coverage using the fixed package.
+- [x] Add server restart coverage for `ACL_MODE=keyhive-experimental` using `${DATA_DIR}/keyhive-acl-snapshot.json`.
 
 ### Phase K7: Beelay/E2EE research
 

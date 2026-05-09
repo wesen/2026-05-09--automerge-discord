@@ -37,17 +37,32 @@ export interface AccessControlAdapter {
   ingestMembershipEvents(events: Uint8Array[]): Promise<Uint8Array[]>
 }
 
+export interface KeyhiveAccessControlSnapshot {
+  signingKeyBytes: number[]
+  archiveBytes?: number[]
+  prekeySecretBytes?: number[]
+  documentIds: string[]
+  agentIds: string[]
+  adminTargets: string[]
+}
+
+export interface KeyhiveAccessControlAdapterOptions {
+  snapshot?: KeyhiveAccessControlSnapshot
+  onSnapshot?: (snapshot: KeyhiveAccessControlSnapshot) => void | Promise<void>
+}
+
 export interface AccessControlConfig {
   mode: 'mock' | 'keyhive-experimental'
   localMemberId?: string
   publicKey?: Uint8Array
+  keyhive?: KeyhiveAccessControlAdapterOptions
 }
 
 export function createAccessControlAdapter(config: AccessControlConfig = { mode: 'mock' }): AccessControlAdapter {
   if (config.mode === 'mock') {
     return new InMemoryAccessControlAdapter(config.localMemberId ?? 'server-admin', config.publicKey ? new Uint8Array(config.publicKey) : undefined)
   }
-  return new KeyhiveAccessControlAdapter()
+  return new KeyhiveAccessControlAdapter(config.keyhive)
 }
 
 export class ForbiddenError extends Error {
@@ -148,18 +163,32 @@ export class InMemoryAccessControlAdapter implements AccessControlAdapter {
 }
 
 export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
-  readonly #signer = KeyhiveWasm.Signer.generateMemory()
+  readonly #signingKeyBytes: Uint8Array
+  readonly #signer: KeyhiveWasm.Signer
   readonly #ciphertextStore = KeyhiveWasm.CiphertextStore.newInMemory()
   readonly #events: Uint8Array[] = []
   readonly #memberId: string
+  readonly #onSnapshot?: (snapshot: KeyhiveAccessControlSnapshot) => void | Promise<void>
+  #archiveBytes?: Uint8Array
+  #snapshotPrekeySecretBytes?: Uint8Array
   #keyhive?: Promise<KeyhiveWasm.Keyhive>
   readonly #documents = new Map<string, KeyhiveWasm.Document>()
   readonly #groups = new Map<string, KeyhiveWasm.Group>()
   readonly #agents = new Map<string, KeyhiveWasm.Agent>()
+  readonly #knownDocumentIds = new Set<string>()
+  readonly #knownAgentIds = new Set<string>()
   readonly #adminTargets = new Set<string>()
 
-  constructor() {
+  constructor(options: KeyhiveAccessControlAdapterOptions = {}) {
+    this.#signingKeyBytes = options.snapshot ? Uint8Array.from(options.snapshot.signingKeyBytes) : randomBytes(32)
+    this.#signer = KeyhiveWasm.Signer.memorySignerFromBytes(this.#signingKeyBytes)
     this.#memberId = `keyhive:${bytesToHex(this.#signer.verifyingKey)}`
+    this.#onSnapshot = options.onSnapshot
+    this.#archiveBytes = options.snapshot?.archiveBytes ? Uint8Array.from(options.snapshot.archiveBytes) : undefined
+    this.#snapshotPrekeySecretBytes = options.snapshot?.prekeySecretBytes ? Uint8Array.from(options.snapshot.prekeySecretBytes) : undefined
+    for (const documentId of options.snapshot?.documentIds ?? []) this.#knownDocumentIds.add(documentId)
+    for (const agentId of options.snapshot?.agentIds ?? []) this.#knownAgentIds.add(agentId)
+    for (const target of options.snapshot?.adminTargets ?? []) this.#adminTargets.add(target)
   }
 
   localMemberId(): string {
@@ -178,8 +207,10 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     const workspaceDocumentId = doc.doc_id.toString()
     this.#groups.set(workspaceGroupId, group)
     this.#documents.set(workspaceDocumentId, doc)
+    this.#knownDocumentIds.add(workspaceDocumentId)
     this.#adminTargets.add(workspaceGroupId)
     this.#adminTargets.add(workspaceDocumentId)
+    await this.persistSnapshot()
     return { workspaceGroupId, workspaceDocumentId }
   }
 
@@ -188,8 +219,10 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     const doc = await keyhive.generateDocument([], randomChangeId(), [])
     const channelDocumentId = doc.doc_id.toString()
     this.#documents.set(channelDocumentId, doc)
+    this.#knownDocumentIds.add(channelDocumentId)
     this.#adminTargets.add(channelDocumentId)
     this.#adminTargets.add(channelId)
+    await this.persistSnapshot()
     return { channelId, channelDocumentId }
   }
 
@@ -199,6 +232,8 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     const individual = await keyhive.receiveContactCard(KeyhiveWasm.ContactCard.fromJson(json))
     const id = `keyhive:${bytesToHex(individual.individualId.bytes)}`
     this.#agents.set(id, individual.toAgent())
+    this.#knownAgentIds.add(id)
+    await this.persistSnapshot()
     return { id, kind: 'individual' }
   }
 
@@ -209,6 +244,7 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     const keyhiveAccess = toKeyhiveAccess(access)
     if (!wasmAgent) throw new ForbiddenError(`unknown Keyhive agent ${agent.id}`)
     await keyhive.addMember(wasmAgent, membered, keyhiveAccess, [])
+    await this.persistSnapshot()
   }
 
   async revoke(agent: AgentRef, target: MemberedRef): Promise<void> {
@@ -217,6 +253,7 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     const membered = this.memberedFor(target)
     if (!wasmAgent) throw new ForbiddenError(`unknown Keyhive agent ${agent.id}`)
     await keyhive.revokeMember(wasmAgent, true, membered)
+    await this.persistSnapshot()
   }
 
   async assertCanRead(docOrChannel: string): Promise<void> {
@@ -241,7 +278,9 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
 
   async ingestMembershipEvents(events: Uint8Array[]): Promise<Uint8Array[]> {
     const keyhive = await this.keyhive()
-    return (await keyhive.ingestEventsBytes(events)).map((event) => new Uint8Array(event as ArrayBuffer | ArrayLike<number>))
+    const ingested = (await keyhive.ingestEventsBytes(events)).map((event) => new Uint8Array(event as ArrayBuffer | ArrayLike<number>))
+    await this.persistSnapshot()
+    return ingested
   }
 
   async exportArchiveBytes(): Promise<Uint8Array> {
@@ -252,10 +291,25 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
     return (await (await this.keyhive()).contactCard()).toJson()
   }
 
+  async exportSnapshot(): Promise<KeyhiveAccessControlSnapshot> {
+    const keyhive = await this.keyhive()
+    const archiveBytes = await this.exportArchiveBytes()
+    const prekeySecretBytes = await keyhive.exportPrekeySecrets()
+    return {
+      signingKeyBytes: Array.from(this.#signingKeyBytes),
+      archiveBytes: Array.from(archiveBytes),
+      prekeySecretBytes: Array.from(prekeySecretBytes),
+      documentIds: Array.from(this.#knownDocumentIds).sort(),
+      agentIds: Array.from(this.#knownAgentIds).sort(),
+      adminTargets: Array.from(this.#adminTargets).sort(),
+    }
+  }
+
   async encryptContentForDocument(documentId: string, contentRef: Uint8Array, predRefs: Uint8Array[], content: Uint8Array): Promise<KeyhiveWasm.Encrypted> {
+    const keyhive = await this.keyhive()
     const doc = this.#documents.get(documentId)
     if (!doc) throw new ForbiddenError(`unknown Keyhive document ${documentId}`)
-    const encrypted = await (await this.keyhive()).tryEncrypt(
+    const encrypted = await keyhive.tryEncrypt(
       doc,
       new KeyhiveWasm.ChangeId(contentRef),
       predRefs.map((predRef) => new KeyhiveWasm.ChangeId(predRef)),
@@ -265,18 +319,45 @@ export class KeyhiveAccessControlAdapter implements AccessControlAdapter {
   }
 
   async decryptContentForDocument(documentId: string, encrypted: KeyhiveWasm.Encrypted): Promise<Uint8Array> {
+    const keyhive = await this.keyhive()
     const doc = this.#documents.get(documentId)
     if (!doc) throw new ForbiddenError(`unknown Keyhive document ${documentId}`)
-    return await (await this.keyhive()).tryDecrypt(doc, encrypted)
+    return await keyhive.tryDecrypt(doc, encrypted)
   }
 
   private keyhive(): Promise<KeyhiveWasm.Keyhive> {
-    this.#keyhive ??= KeyhiveWasm.Keyhive.init(this.#signer.clone(), this.#ciphertextStore, (event: unknown) => {
+    this.#keyhive ??= this.initKeyhive()
+    return this.#keyhive
+  }
+
+  private async initKeyhive(): Promise<KeyhiveWasm.Keyhive> {
+    const eventHandler = (event: unknown) => {
       if (event && typeof event === 'object' && 'toBytes' in event && typeof event.toBytes === 'function') {
         this.#events.push(new Uint8Array(event.toBytes() as Uint8Array))
       }
-    })
-    return this.#keyhive
+    }
+    const keyhive = this.#archiveBytes
+      ? await new KeyhiveWasm.Archive(this.#archiveBytes).tryToKeyhive(this.#ciphertextStore, this.#signer.clone(), eventHandler)
+      : await KeyhiveWasm.Keyhive.init(this.#signer.clone(), this.#ciphertextStore, eventHandler)
+    if (this.#snapshotPrekeySecretBytes) await keyhive.importPrekeySecrets(this.#snapshotPrekeySecretBytes)
+    await this.hydrateKnownRefs(keyhive)
+    return keyhive
+  }
+
+  private async hydrateKnownRefs(keyhive: KeyhiveWasm.Keyhive): Promise<void> {
+    for (const documentId of this.#knownDocumentIds) {
+      const doc = await keyhive.getDocument(new KeyhiveWasm.DocumentId(hexToBytes(documentId)))
+      if (doc) this.#documents.set(documentId, doc)
+    }
+    for (const agentId of this.#knownAgentIds) {
+      const agent = await keyhive.getAgent(new KeyhiveWasm.Identifier(hexToBytes(agentId.replace(/^keyhive:/, ''))))
+      if (agent) this.#agents.set(agentId, agent)
+    }
+  }
+
+  private async persistSnapshot(): Promise<void> {
+    if (!this.#onSnapshot) return
+    await this.#onSnapshot(await this.exportSnapshot())
   }
 
   private memberedFor(target: MemberedRef): KeyhiveWasm.Membered {
@@ -304,12 +385,24 @@ function toKeyhiveAccess(access: ChatAccess): KeyhiveWasm.Access {
 }
 
 function randomChangeId(): KeyhiveWasm.ChangeId {
-  const bytes = new Uint8Array(32)
+  return new KeyhiveWasm.ChangeId(randomBytes(32))
+}
+
+function randomBytes(length: number): Uint8Array {
+  const bytes = new Uint8Array(length)
   if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes)
   else for (let i = 0; i < bytes.length; i += 1) bytes[i] = Math.floor(Math.random() * 256)
-  return new KeyhiveWasm.ChangeId(bytes)
+  return bytes
 }
 
 function bytesToHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  const normalized = hex.replace(/^keyhive:/, '').replace(/^0x/, '')
+  if (normalized.length % 2 !== 0) throw new ForbiddenError(`invalid hex identifier ${hex}`)
+  const bytes = new Uint8Array(normalized.length / 2)
+  for (let i = 0; i < bytes.length; i += 1) bytes[i] = Number.parseInt(normalized.slice(i * 2, i * 2 + 2), 16)
+  return bytes
 }

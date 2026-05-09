@@ -58,14 +58,14 @@ export function createBootstrapRouter(repo: Repo, config: ServerConfig, acl: Acc
       const membershipEvents = await acl.exportMembershipEventsFor(agent)
       res.status(201).json({
         invitationId: `inv_${Date.now().toString(36)}`,
-        mode: 'mock',
+        mode: config.aclMode,
         agent,
         target,
         access: invite.access,
         membershipEventCount: membershipEvents.length,
         invitation: {
           kind: 'autodisco.invitation.v1',
-          mode: 'mock',
+          mode: config.aclMode,
           agent,
           target,
           access: invite.access,
@@ -87,7 +87,7 @@ export function createBootstrapRouter(repo: Repo, config: ServerConfig, acl: Acc
       await acl.assertCanAdmin(revoke.workspaceDocumentId)
       const target = { id: revoke.workspaceDocumentId, kind: 'document' as const }
       await acl.revoke(revoke.agent, target)
-      res.status(200).json({ mode: 'mock', agent: revoke.agent, target, revoked: true })
+      res.status(200).json({ mode: config.aclMode, agent: revoke.agent, target, revoked: true })
     } catch (error) {
       respondWithError(res, error)
     }

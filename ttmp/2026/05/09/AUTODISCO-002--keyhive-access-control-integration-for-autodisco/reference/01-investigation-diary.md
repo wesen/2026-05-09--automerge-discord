@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:12:00-04:00
+LastUpdated: 2026-05-09T16:20:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1132,3 +1132,65 @@ The patched local repro printed `hello`. Typecheck passed. The `@autodisco/chat-
 ### Remaining limitation
 
 This uses a local patched package from `vendor/keyhive-src/keyhive_wasm/pkg-node-patched`, not an upstream-published package. The next production-quality step is still to upstream the Rust binding fix and then return to a normal npm dependency.
+
+## Step 14: Durable Keyhive snapshot persistence
+
+After proving encryption/decryption with the locally fixed package, I implemented the previously missing durable Keyhive state path for AUTODISCO-002.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue durable keyhive"
+
+**Assistant interpretation:** Finish the K6 persistence task by making the experimental Keyhive adapter survive process restarts, including signer identity and archive state, and prove it through tests.
+
+### What changed
+
+- Added `KeyhiveAccessControlSnapshot` to `packages/chat-acl/src/index.ts`.
+- Added `KeyhiveAccessControlAdapterOptions` with:
+  - `snapshot` for restoring persisted state;
+  - `onSnapshot` for writing state after mutations.
+- Changed `KeyhiveAccessControlAdapter` so it no longer creates an opaque non-exportable memory signer directly. It now generates or restores 32 signing-key bytes and constructs the signer with `Signer.memorySignerFromBytes(...)`.
+- Persisted the following JSON-safe state:
+  - `signingKeyBytes`
+  - `archiveBytes`
+  - `prekeySecretBytes`
+  - `documentIds`
+  - `agentIds`
+  - `adminTargets`
+- Restored Keyhive from `Archive.tryToKeyhive(...)` when archive bytes exist.
+- Rehydrated known document handles from `Keyhive.getDocument(new DocumentId(...))` so document-level encrypt/decrypt and invite flows can continue after restart.
+- Rehydrated known agents from `Keyhive.getAgent(new Identifier(...))` when agent IDs are present.
+- Added server-side file persistence for experimental mode in `packages/chat-server/src/app.ts`:
+  - snapshot path: `${DATA_DIR}/keyhive-acl-snapshot.json`
+  - atomic write: write `keyhive-acl-snapshot.json.tmp`, then rename.
+- Updated invitation responses to report `mode: config.aclMode` instead of always reporting `mock`.
+
+### Tests added
+
+- `packages/chat-acl/test/keyhive-adapter.test.ts`
+  - restores signing identity, archive state, known documents, and admin targets from a snapshot;
+  - verifies encryption/decryption after adapter restoration;
+  - verifies `onSnapshot` fires after mutations and includes archive/document/admin state.
+- `packages/chat-server/test/bootstrap.test.ts`
+  - starts a server in `ACL_MODE=keyhive-experimental`;
+  - creates a workspace;
+  - verifies `${DATA_DIR}/keyhive-acl-snapshot.json` exists and contains the workspace document;
+  - stops the server;
+  - starts a second server with the same data directory;
+  - creates a real Keyhive peer contact card;
+  - proves the restarted server can still assert admin on the restored workspace document and create an invitation.
+
+### Validation
+
+```bash
+npm run typecheck
+npm test
+npm run build
+```
+
+All validation passed.
+
+### Remaining limitations
+
+- The restored path is document-centric. Keyhive groups are recorded as admin target IDs, but the current WASM API exposes no public JavaScript `GroupId` constructor, so this implementation does not rehydrate `Group` objects for group-level membership mutation after restart.
+- The server snapshot is local JSON. It is adequate for the prototype, but a production deployment needs encrypted-at-rest storage, schema versioning, backup/recovery behavior, and potentially a multi-process locking strategy.

@@ -103,3 +103,15 @@ Resumed AUTODISCO-002 using the locally fixed Keyhive package from repo-root `ve
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — experimental encrypt/decrypt helpers
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-spike.test.ts — real Keyhive encrypt/decrypt proof
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts — adapter encrypt/decrypt proof
+
+## 2026-05-09
+
+Implemented durable experimental Keyhive persistence. `KeyhiveAccessControlAdapter` now exports/restores a JSON-safe snapshot containing signing-key bytes, archive bytes, prekey secret bytes, known document IDs, known agent IDs, and admin targets. The server writes this snapshot to `${DATA_DIR}/keyhive-acl-snapshot.json` when `ACL_MODE=keyhive-experimental`, and restart coverage proves a restored server can create invitations for an existing workspace document.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/src/index.ts — snapshot model, restore path, persistence callbacks, and document/agent rehydration
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/keyhive-adapter.test.ts — adapter snapshot restore tests
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/app.ts — file-backed server snapshot wiring
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — invitation response mode now follows `config.aclMode`
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — server restart persistence test

@@ -1,6 +1,7 @@
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { KeyhiveAccessControlAdapter } from '@autodisco/chat-acl'
 import type { WorkspaceDoc } from '@autodisco/chat-core'
 import { describe, expect, it } from 'vitest'
 import { createChatServer } from '../src/app.js'
@@ -103,6 +104,68 @@ describe('bootstrap HTTP API', () => {
     } finally {
       chat.runtime.wss.close()
       await new Promise<void>((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())))
+      await rm(dataDir, { recursive: true, force: true })
+    }
+  })
+
+  it('persists experimental Keyhive ACL snapshots across server restarts', async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), 'autodisco-keyhive-test-'))
+    const config: ServerConfig = {
+      host: '127.0.0.1',
+      port: 0,
+      dataDir,
+      publicBaseUrl: 'http://localhost:3030',
+      syncPath: '/sync',
+      aclMode: 'keyhive-experimental',
+    }
+    let workspaceDocumentId = ''
+    try {
+      const first = createChatServer(config)
+      const firstServer = await first.listen()
+      try {
+        const address = firstServer.address()
+        if (!address || typeof address === 'string') throw new Error('expected TCP listener')
+        const response = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/workspaces`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: 'Durable Keyhive Guild' }),
+        })
+        const body = (await response.json()) as { keyhive: { workspaceDocumentId: string } }
+        expect(response.status).toBe(201)
+        workspaceDocumentId = body.keyhive.workspaceDocumentId
+        const snapshot = JSON.parse(await readFile(join(dataDir, 'keyhive-acl-snapshot.json'), 'utf8')) as { documentIds: string[]; archiveBytes: number[] }
+        expect(snapshot.documentIds).toContain(workspaceDocumentId)
+        expect(snapshot.archiveBytes.length).toBeGreaterThan(0)
+      } finally {
+        first.runtime.wss.close()
+        await new Promise<void>((resolve, reject) => firstServer.close((err) => (err ? reject(err) : resolve())))
+      }
+
+      const peer = new KeyhiveAccessControlAdapter()
+      const contactCard = await peer.exportOwnContactCardJson()
+      const second = createChatServer(config)
+      const secondServer = await second.listen()
+      try {
+        const address = secondServer.address()
+        if (!address || typeof address === 'string') throw new Error('expected TCP listener')
+        const inviteResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            workspaceDocumentId,
+            access: 'read',
+            contactCard: { keyhiveContactCardJson: contactCard },
+          }),
+        })
+        const inviteBody = (await inviteResponse.json()) as { mode: string; target: { id: string } }
+        expect(inviteResponse.status).toBe(201)
+        expect(inviteBody.mode).toBe('keyhive-experimental')
+        expect(inviteBody.target.id).toBe(workspaceDocumentId)
+      } finally {
+        second.runtime.wss.close()
+        await new Promise<void>((resolve, reject) => secondServer.close((err) => (err ? reject(err) : resolve())))
+      }
+    } finally {
       await rm(dataDir, { recursive: true, force: true })
     }
   })
