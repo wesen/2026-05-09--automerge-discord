@@ -101,3 +101,13 @@ Added offline/reconnect Automerge integration coverage: Bob syncs initial state,
 ### Related Files
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — live sync, persistence, and offline/reconnect relay tests
+
+## 2026-05-09
+
+Added workspace sharing UX polish and a toggleable debug log pane: copy buttons for document/sync/join links, join-link query parsing, local-session reset with IndexedDB cleanup, and in-app logging for create/open/copy/send/status/reset events.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx — copy/reset actions on active workspace metadata
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/organisms/LogPane — toggleable debug log pane
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — join-link parsing/generation, logging, clipboard, and reset flow

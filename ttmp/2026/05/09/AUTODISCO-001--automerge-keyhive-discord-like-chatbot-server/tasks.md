@@ -63,6 +63,10 @@
 - [x] Add browser Automerge Repo/DocHandle wiring so the web UI uses live distributed state instead of fixtures.
 - [x] Manually verify two isolated browser contexts sync live messages through the relay.
 - [x] Promote manual two-context Playwright browser sync smoke into an automated test.
+- [x] Add workspace copy buttons for Automerge doc URL, sync URL, and join link.
+- [x] Add join-link query parameter support for opening shared workspaces.
+- [x] Add reset-local-session control for clearing active workspace, local identity, peer id, and Automerge IndexedDB storage.
+- [x] Add toggleable debug log pane for create/open/copy/send/status/reset events.
 
 ### Phase 4: Keyhive integration spike
 

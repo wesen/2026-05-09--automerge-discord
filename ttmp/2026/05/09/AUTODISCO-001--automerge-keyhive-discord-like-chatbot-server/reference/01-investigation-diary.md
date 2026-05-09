@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:52:00-04:00
+LastUpdated: 2026-05-09T13:58:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -1472,3 +1472,94 @@ The test must wait for Bob to receive the initial workspace/channel state before
 Primary file changed:
 
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`
+
+
+## Step 17: Polish workspace sharing/opening and add a toggleable debug log pane
+
+I implemented the copy/open UX polish requested after explaining the rough edges in the first live Automerge browser flow, and added an in-app debug log pane to help diagnose collaboration issues from the UI.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Ok, go ahead. Also add a log pane (can be toggled) so we can get help debugging"
+
+**Assistant interpretation:** Make workspace sharing less developer-manual by adding copy buttons and join-link support, and add visible/toggleable app event logging for debugging the live Automerge flow.
+
+**Inferred user intent:** The user wants the prototype to be easier to test in multiple sessions and to expose enough state/event context to debug sync issues without immediately opening browser devtools.
+
+### What I did
+
+- Extended `WorkspaceCard` with copy actions for:
+  - Automerge document URL,
+  - sync URL,
+  - complete join link.
+- Added a `Reset Local` action when a workspace is active.
+- Added join-link generation with `doc`, `sync`, and `label` query parameters.
+- Added startup parsing for join links, so opening a URL like `/?doc=automerge:...&sync=ws://...` stores and opens that workspace.
+- Added `resetBrowserRepoStorage()` to shut down the in-browser Repo for a sync URL and delete the corresponding IndexedDB database.
+- Added `LogPane` under `components/organisms/LogPane` with Storybook stories.
+- Added a toggleable debug log panel to `HomePage`, logging client boot, create/open status, workspace ready/failure events, copy actions, sends, and reset attempts.
+- Updated layout CSS so the chat and log pane share a right-side work area.
+- Updated `OpenWorkspaceForm` so sync URL defaults follow prop changes and helper text mentions join links.
+
+### Why
+
+Before this step, sharing a workspace required manually selecting raw text from the card and explaining which values belonged in another browser. The copy buttons and join URL create a clearer multi-session workflow. The debug log gives immediate visibility into UI and Automerge lifecycle events, which is useful while testing live collaboration and future offline/reconnect scenarios.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+npm --workspace @autodisco/chat-web run test:e2e
+devctl test-web-sync --timeout 120s
+```
+
+Manual Playwright smoke confirmed the AUTODISCO page loads with copy buttons, the reset button, and a collapsed log pane that can be toggled open. No browser console errors were reported.
+
+### What didn't work
+
+TypeScript initially failed because I used `density="compact"` on `MacButton`, but the component API uses a boolean `compact` prop. I updated the new buttons accordingly.
+
+`StatusPill` requires a string child, and I initially passed a number expression for the event count. I changed it to a formatted string.
+
+The first `LogPane` Storybook args were missing required no-op callbacks for `onToggle` and `onClear`; I added them to the story meta args.
+
+### What I learned
+
+The small component APIs matter when composing higher-level UX. The `MacButton` atom already had the compact behavior; using that atom consistently kept the new copy/log controls inside the same retro design system.
+
+### What was tricky to build
+
+The reset flow must clear several browser state layers: active workspace metadata, local member identity, session peer id, and Automerge IndexedDB storage. I made it reload to avoid stale in-memory Repo state after deletion.
+
+### What warrants a second pair of eyes
+
+- Review whether the join URL should use `doc` or `workspace` as the canonical query parameter. Currently `doc` is emitted and both `doc` and `workspace` are accepted.
+- Review whether debug logs should persist across reloads or remain in-memory only.
+- Review whether `Reset Local` should be available in a separate dev/debug panel rather than on the workspace card.
+
+### What should be done in the future
+
+- Add a visible copy-success affordance beyond the log entry, such as changing button text briefly to `Copied`.
+- Add connection/peer details to the debug pane once the network adapter exposes useful state.
+- Add a visible import field for full join JSON if we later include Keyhive invite material.
+
+### Code review instructions
+
+- Review `WorkspaceCard` for copy/reset actions.
+- Review `HomePage` for join URL generation/parsing, clipboard handling, reset flow, and log wiring.
+- Review `LogPane` and its stories.
+- Validate with the commands listed above while devctl services remain running.
+
+### Technical details
+
+Primary files changed or added:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/WorkspaceCard/WorkspaceCard.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/organisms/LogPane`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/automerge/repo.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/index.css`
