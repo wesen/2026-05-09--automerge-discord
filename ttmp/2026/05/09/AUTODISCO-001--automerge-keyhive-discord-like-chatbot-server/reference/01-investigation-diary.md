@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T13:47:00-04:00
+LastUpdated: 2026-05-09T13:52:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -1391,3 +1391,84 @@ Primary files added or changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/package.json`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.gitignore`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
+
+
+## Step 16: Add offline/reconnect convergence coverage
+
+I added a Node integration test for the local-first case: one client goes offline with its own local storage, edits the workspace while disconnected, then reconnects and converges with online edits made by another client.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue"
+
+**Assistant interpretation:** Continue filling the distributed-system test matrix after live sync, persistence/restart, and browser E2E coverage.
+
+**Inferred user intent:** The user wants proof that the system behaves like a distributed Automerge application, including offline edits and later merge.
+
+### What I did
+
+- Extended `packages/chat-server/test/sync.test.ts` with `merges offline client edits after reconnect`.
+- Added client-side `NodeFSStorageAdapter` usage in the test helpers.
+- The test flow is:
+  1. start a real relay,
+  2. bootstrap a real workspace doc,
+  3. connect Alice and Bob as independent Repos, with Bob using a persistent local data directory,
+  4. initialize workspace members/channel,
+  5. shut down Bob's networked Repo to simulate disconnect while preserving local storage,
+  6. let Alice send a message while Bob is away,
+  7. create a local-only Bob Repo from the same storage and send an offline message,
+  8. reconnect Bob with storage plus WebSocket sync,
+  9. assert Alice and Bob both converge on both messages.
+
+### Why
+
+Two live peers syncing is necessary but not sufficient for local-first behavior. This test proves divergent edits from a disconnected local replica merge back through the relay after reconnect.
+
+### What worked
+
+The package test passed:
+
+```bash
+npm --workspace @autodisco/chat-server test
+```
+
+Full typecheck and unit/integration tests passed:
+
+```bash
+npm run typecheck
+npm test
+```
+
+### What didn't work
+
+No failures in this step. The existing helper cleanup pattern was enough once the Bob online/offline/reconnect Repos were explicitly shut down and removed from the shared cleanup list at each transition.
+
+### What I learned
+
+The Repo abstraction makes this test straightforward: offline mode can be represented by a Repo with storage and no network adapter, and reconnect mode by a new Repo using the same storage plus `WebSocketClientAdapter`.
+
+### What was tricky to build
+
+The test must wait for Bob to receive the initial workspace/channel state before disconnecting. Otherwise Bob's offline local storage may not contain enough document state to apply the offline message through the normal `sendMessage` mutation.
+
+### What warrants a second pair of eyes
+
+- Consider whether the browser app should expose an explicit offline indicator and reconnect status.
+- Decide whether this test should be mirrored in Playwright once browser network toggling is introduced.
+
+### What should be done in the future
+
+- Add a browser-level offline/reconnect E2E test.
+- Add UI affordances for connection state and unsynced local edits.
+- Consider extracting shared sync-test helpers if more peer scenarios are added.
+
+### Code review instructions
+
+- Review `merges offline client edits after reconnect` in `packages/chat-server/test/sync.test.ts`.
+- Confirm Bob's offline edit is made without any network adapter and later converges after reconnect.
+
+### Technical details
+
+Primary file changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts`

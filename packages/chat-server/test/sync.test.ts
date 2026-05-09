@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Repo, type DocHandle, type PeerId } from '@automerge/automerge-repo'
 import { WebSocketClientAdapter } from '@automerge/automerge-repo-network-websocket'
+import { NodeFSStorageAdapter } from '@automerge/automerge-repo-storage-nodefs'
 import {
   addMember,
   createChannel,
@@ -54,6 +55,51 @@ describe('Automerge relay sync', () => {
     const expectedBodies = ['hello from alice', 'hello from bob']
     await waitForMessages(aliceHandle, channelId, expectedBodies)
     await waitForMessages(bobHandle, channelId, expectedBodies)
+  }, 20_000)
+
+  it('merges offline client edits after reconnect', async () => {
+    const started = await startServer()
+    const bobDataDir = await mkdtemp(join(tmpdir(), 'autodisco-bob-offline-test-'))
+    try {
+      const bootstrap = await bootstrapWorkspace(started.baseUrl, 'Offline Guild')
+      const aliceRepo = createClientRepo('alice-offline', started.syncUrl)
+      const bobOnlineRepo = createClientRepo('bob-online', started.syncUrl, bobDataDir)
+
+      const aliceHandle = await aliceRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+      const { channelId, aliceId, bobId } = initializeWorkspace(aliceHandle)
+
+      const bobOnlineHandle = await bobOnlineRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+      await waitForDoc(bobOnlineHandle, (doc) => Boolean(doc.channels[channelId] && doc.members[bobId]))
+      await bobOnlineRepo.shutdown()
+      removeRunningRepo(bobOnlineRepo)
+
+      sendChatMessage(aliceHandle, {
+        channelId,
+        authorId: aliceId,
+        body: 'online while bob is away',
+        createdAt: '2026-05-09T17:03:00Z',
+      })
+
+      const bobOfflineRepo = createLocalClientRepo('bob-offline', bobDataDir)
+      const bobOfflineHandle = await bobOfflineRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+      sendChatMessage(bobOfflineHandle, {
+        channelId,
+        authorId: bobId,
+        body: 'offline from bob',
+        createdAt: '2026-05-09T17:03:01Z',
+      })
+      await bobOfflineRepo.shutdown()
+      removeRunningRepo(bobOfflineRepo)
+
+      const bobReconnectRepo = createClientRepo('bob-reconnect', started.syncUrl, bobDataDir)
+      const bobReconnectHandle = await bobReconnectRepo.find<WorkspaceDoc>(bootstrap.workspaceDocUrl)
+
+      const expectedBodies = ['online while bob is away', 'offline from bob']
+      await waitForMessages(aliceHandle, channelId, expectedBodies)
+      await waitForMessages(bobReconnectHandle, channelId, expectedBodies)
+    } finally {
+      await rm(bobDataDir, { recursive: true, force: true })
+    }
   }, 20_000)
 
   it('persists synced workspace edits across relay restarts', async () => {
@@ -154,9 +200,19 @@ function chatClose(chat: ChatServer): void {
   chat.runtime.wss.close()
 }
 
-function createClientRepo(name: string, syncUrl: string): Repo {
+function createClientRepo(name: string, syncUrl: string, dataDir?: string): Repo {
   const repo = new Repo({
     network: [new WebSocketClientAdapter(syncUrl, 100)],
+    storage: dataDir ? new NodeFSStorageAdapter(dataDir) : undefined,
+    peerId: `test-${name}-${crypto.randomUUID()}` as PeerId,
+  })
+  runningRepos.push(repo)
+  return repo
+}
+
+function createLocalClientRepo(name: string, dataDir: string): Repo {
+  const repo = new Repo({
+    storage: new NodeFSStorageAdapter(dataDir),
     peerId: `test-${name}-${crypto.randomUUID()}` as PeerId,
   })
   runningRepos.push(repo)

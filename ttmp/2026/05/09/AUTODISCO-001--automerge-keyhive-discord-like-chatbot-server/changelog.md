@@ -93,3 +93,11 @@ Added Playwright E2E coverage for live browser Automerge sync: two isolated brow
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/playwright.config.ts — Playwright configuration
 
 Added devctl dynamic command `test-web-sync` to run the Playwright two-session browser sync test against already-running development services.
+
+## 2026-05-09
+
+Added offline/reconnect Automerge integration coverage: Bob syncs initial state, disconnects with local storage, edits offline, reconnects, and converges with Alice's online edit.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/sync.test.ts — live sync, persistence, and offline/reconnect relay tests
