@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T17:12:00-04:00
+LastUpdated: 2026-05-09T17:24:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1329,63 +1329,172 @@ I also inspected the running Keyhive profile at a narrow viewport using Playwrig
 
 ## Step 18: Wrap copied Keyhive contact cards in an AUTODISCO envelope
 
-The Keyhive contact-card copy button was technically copying a valid raw Keyhive contact card, but the payload was an opaque object such as `{ "Rotate": ... }`. That is valid for `ContactCard.fromJson(...)`, but it is confusing in the AUTODISCO UI and does not identify the payload as an AUTODISCO contact card.
+The Keyhive contact-card copy button was technically copying a valid raw Keyhive contact card, but the payload was an opaque object such as `{ "Rotate": ... }`. That was correct for `ContactCard.fromJson(...)`, but it was not correct for a user-facing AUTODISCO affordance because the copied value did not say what it was, which mode produced it, or how it should be pasted back into the app.
+
+This step kept the raw Keyhive payload intact while wrapping it in an AUTODISCO contact-card envelope. The result is a copy/paste object that humans can recognize and the backend can still unwrap into Keyhive's native contact-card format.
 
 ### Prompt Context
 
-**User prompt (verbatim):** the user pasted the copied contact card showing a raw Keyhive `Rotate` object.
+**User prompt (verbatim):** "This is what I get when I click \"Copy contact card\":" followed by a raw Keyhive `{\"Rotate\": ...}` JSON payload.
 
-**Assistant interpretation:** Keep the raw Keyhive card intact for backend parsing, but copy a clearer AUTODISCO envelope around it.
+**Assistant interpretation:** The copied value is technically usable but too opaque; make the UI copy a typed AUTODISCO envelope around the raw Keyhive card.
 
-### What changed
+**Inferred user intent:** The user wanted the contact-card feature to feel understandable and product-shaped rather than exposing a confusing internal Keyhive event object.
 
-- Updated the web `Copy Contact Card` behavior in Keyhive mode to copy an envelope:
+**Commit (code):** e9c4c75 — "Wrap Keyhive contact cards for copying"
+
+### What I did
+
+- Updated `packages/chat-web/src/pages/HomePage/HomePage.tsx`.
+- Added `stringifyRuntimeContactCard(...)` so Keyhive mode copies:
   - `kind: autodisco.contact-card.v1`
   - `mode: keyhive-experimental`
+  - `displayName: Server Keyhive Identity`
   - `agent.id: keyhive:...`
   - `publicKeyFingerprint`
-  - `keyhiveContactCardJson`, containing the raw opaque Keyhive `Rotate` payload string
+  - `keyhiveContactCardJson`, containing the raw Keyhive `Rotate` payload string
   - `createdAt`
-- Kept backend compatibility because `parseKeyhiveContactCardJson(...)` already accepts objects with `keyhiveContactCardJson`.
-- Added invitation-form helper text explaining that Keyhive-mode contact cards contain an opaque Keyhive card under `keyhiveContactCardJson`.
+- Kept mock mode on the existing `stringifyContactCard(identity)` path.
+- Updated `packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx` helper text to explain that a Keyhive-mode contact card contains an opaque raw Keyhive card under `keyhiveContactCardJson`.
+- Updated the AUTODISCO-002 changelog and diary, then committed the change.
 
-### Validation
+### Why
+
+The raw `{ "Rotate": ... }` object is Keyhive's internal contact-card representation. It is valid API input, but not a good clipboard contract for AUTODISCO users. A typed envelope gives the product a stable shape while preserving the native Keyhive payload.
+
+### What worked
+
+- The backend already had `parseKeyhiveContactCardJson(...)`, which accepts an object with `keyhiveContactCardJson`; no server parser change was required.
+- The resulting copied payload became self-describing and can be pasted into the invite form without losing the raw Keyhive card.
+
+### What didn't work
+
+No code failure occurred during this step. The failure was a UX/API-boundary failure: exposing the raw Keyhive `Rotate` object made the feature look broken even though the underlying Keyhive payload was valid.
+
+### What I learned
+
+For experimental cryptographic APIs, the product should never expose native library serialization as the primary user contract. Wrap it in an app-level envelope with `kind`, `mode`, and agent metadata, then keep the native payload as an explicit field.
+
+### What was tricky to build
+
+The tricky part was preserving backend compatibility while improving UX. If the UI had transformed or normalized the raw Keyhive JSON, it could have broken `ContactCard.fromJson(...)`. The safe approach was to store the raw serialized Keyhive card as a string under `keyhiveContactCardJson` and let the existing backend unwrap exactly that string.
+
+### What warrants a second pair of eyes
+
+- Confirm that the envelope shape should be the stable AUTODISCO contact-card contract.
+- Confirm whether `displayName: Server Keyhive Identity` is acceptable while the copied Keyhive card still represents the backend adapter rather than a browser-native user identity.
+- Confirm that storing raw Keyhive JSON as a string field is preferable to storing it as an object for future wire compatibility.
+
+### What should be done in the future
+
+When browser-native Keyhive identity exists, this envelope should represent the browser peer rather than the backend server adapter. At that point the contact-card envelope should probably gain a schema version and maybe a clear `transport` or `source` field.
+
+### Code review instructions
+
+- Start in `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx` at `stringifyRuntimeContactCard(...)`.
+- Check `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts` at `parseKeyhiveContactCardJson(...)` to verify the backend accepts the envelope.
+- Validate with:
 
 ```bash
 npm run typecheck
 npm --workspace @autodisco/chat-web run build
 ```
 
+### Technical details
+
+The copied Keyhive-mode envelope has this shape:
+
+```json
+{
+  "kind": "autodisco.contact-card.v1",
+  "mode": "keyhive-experimental",
+  "displayName": "Server Keyhive Identity",
+  "agent": { "id": "keyhive:...", "kind": "individual" },
+  "publicKeyFingerprint": "...",
+  "keyhiveContactCardJson": "{... raw Keyhive card ...}",
+  "createdAt": "..."
+}
+```
+
 ## Step 19: Add invitation acceptance plumbing
 
-After creating a real Keyhive invitation, the next UX gap was obvious: the app copied a useful `autodisco.invitation.v1` payload, but there was nowhere in the UI to paste it back and ingest its membership events.
+After creating a real Keyhive invitation, the next UX gap was obvious: the app copied a useful `autodisco.invitation.v1` payload, but there was nowhere in the UI to paste it back and ingest its membership events. That made the invitation flow feel like it ended at a blob of JSON rather than a testable workflow.
+
+This step added a visible acceptance path. It does not yet create a separate browser-native Keyhive peer, but it does prove that the invitation payload is structurally useful: the membership events can be decoded, sent to the ACL adapter, and ingested by Keyhive in experimental mode.
 
 ### Prompt Context
 
-**User prompt (verbatim):** "Ok, so I can create the invite like this: ... now what?"
+**User prompt (verbatim):** "Ok, so I can create the invite like this:" followed by a full `autodisco.invitation.v1` JSON payload, then "now what?"
 
-**Assistant interpretation:** The prototype needs at least a visible acceptance step so users can paste the generated invitation and see the membership-event ingestion path execute.
+**Assistant interpretation:** The user successfully created an invitation and needed the next app-level step: a way to accept or ingest the invitation rather than only inspect it.
 
-### What changed
+**Inferred user intent:** The user wanted a demonstrable end-to-end flow for invitation JSON, including proof that the `membershipEvents` field is meaningful.
+
+**Commit (code):** 6acfaf3 — "Add invitation acceptance flow"
+
+### What I did
 
 - Implemented `POST /api/bootstrap/invitations/accept` in `packages/chat-server/src/http/bootstrap.ts`.
-- The accept endpoint accepts either the invitation object directly or `{ invitation: ... }`.
-- It decodes base64 `membershipEvents` and calls `acl.ingestMembershipEvents(...)`.
-- Added RTK Query accept-invitation types and mutation in `packages/chat-web/src/features/bootstrap/bootstrapApi.ts`.
-- Added `AcceptInvitationForm` as a new molecule with Storybook story.
-- Added the acceptance form to `HomePage`.
-- When `Create Invite` succeeds, the generated invitation JSON is copied to the clipboard and also prefilled into the new accept form.
-- Added server tests for accepting both mock and Keyhive experimental invitations.
+- Accepted both invitation-object bodies and `{ invitation: ... }` bodies.
+- Parsed `membershipEvents` as base64 strings.
+- Decoded events with `Buffer.from(event, 'base64')` and handed them to `acl.ingestMembershipEvents(...)`.
+- Returned:
+  - `mode`
+  - `accepted: true`
+  - optional `agent`, `target`, and `access`
+  - `membershipEventCount`
+  - `ingestedEventCount`
+- Added RTK Query accept-invitation request/response types and `useAcceptInvitationMutation` in `packages/chat-web/src/features/bootstrap/bootstrapApi.ts`.
+- Added `packages/chat-web/src/components/molecules/AcceptInvitationForm/` with component, index, and Storybook story.
+- Added the accept form to `HomePage`.
+- Made `Create Invite` copy the invitation JSON and also prefill the accept form with the generated payload.
+- Added server tests for accepting mock and Keyhive experimental invitations.
 
-### What this proves
+### Why
 
-This proves the invitation payload is structurally useful: the membership events can be decoded and handed back to the ACL adapter. In Keyhive mode, this invokes real Keyhive event ingestion.
+The user had reached the point where a valid invitation existed. Without an accept step, the only possible validation was manual inspection of base64 membership events. Adding acceptance converts the payload from an inert artifact into an executable workflow.
 
-### Remaining limitation
+### What worked
 
-The acceptance form currently ingests into the same running backend adapter. It is a working plumbing step, but a complete product needs separate browser-native or peer-server identities so the invited peer accepts the invitation into its own Keyhive state.
+- The existing `AccessControlAdapter.ingestMembershipEvents(...)` seam was already present, so the endpoint could stay adapter-agnostic.
+- In mock mode, accepting an invitation is harmless and reports zero events.
+- In Keyhive mode, accepting an invitation invokes real Keyhive event ingestion.
+- Storybook built successfully with the new molecule.
 
-### Validation
+### What didn't work
+
+The first typecheck failed because TypeScript could not narrow dynamically parsed `kind` fields in `parseAcceptInvitationRequest(...)`:
+
+```text
+packages/chat-server/src/http/bootstrap.ts(171,12): error TS2322: Type '{ id: string; kind: string; } | undefined' is not assignable to type '{ id: string; kind: "individual" | "group" | "bot"; } | undefined'.
+```
+
+I fixed this by explicitly narrowing/casting the parsed `agentKind` and by returning `kind: 'document' as const` for the target.
+
+### What I learned
+
+The invitation JSON is now useful as a copy/paste test artifact. However, accepting it into the same backend adapter is not the same as accepting it into a distinct peer. The current implementation proves parsing, decoding, and ingestion plumbing, not full peer onboarding.
+
+### What was tricky to build
+
+The tricky part was choosing the correct acceptance target. A real product would accept into the invited peer's local Keyhive identity. AUTODISCO does not yet have browser-native Keyhive identity, so I intentionally made the accept endpoint ingest into the active backend adapter and documented the limitation. This keeps the flow testable without pretending it is the final security model.
+
+### What warrants a second pair of eyes
+
+- Review whether accepting `{ invitation: ... }` and raw invitation bodies is too permissive or useful for development.
+- Review whether `ingestedEventCount` semantics are clear; it can be zero if the events are already known.
+- Review the fact that the UI pre-fills the just-created invitation into the same server's accept form, which is useful for demonstration but could confuse users about distinct peer identity.
+
+### What should be done in the future
+
+Add a distinct acceptance target: either browser-native Keyhive state or a second devctl peer profile with its own data directory and backend identity. That would let us prove that Peer A can invite Peer B and Peer B can ingest membership events into its own durable state.
+
+### Code review instructions
+
+- Start with `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts` at `/invitations/accept` and `parseAcceptInvitationRequest(...)`.
+- Then review `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts` for the mutation contract.
+- Then review `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/AcceptInvitationForm/AcceptInvitationForm.tsx` and `HomePage.tsx` for UI flow.
+- Validate with:
 
 ```bash
 npm run typecheck
@@ -1393,8 +1502,134 @@ npm --workspace @autodisco/chat-server test
 npm --workspace @autodisco/chat-web run build-storybook
 ```
 
+### Technical details
+
+Acceptance endpoint request examples:
+
+```json
+{
+  "invitation": {
+    "kind": "autodisco.invitation.v1",
+    "mode": "keyhive-experimental",
+    "membershipEvents": ["..."]
+  }
+}
+```
+
+or directly:
+
+```json
+{
+  "kind": "autodisco.invitation.v1",
+  "mode": "keyhive-experimental",
+  "membershipEvents": ["..."]
+}
+```
+
 ## Step 20: Onboarding README and updated Keyhive project report
 
 I added a top-level README for AUTODISCO so someone can start the app without reading the full ticket history first. The README explains what the app is, what works today, how to run the default and Keyhive devctl profiles, how to test chat, how to use contact cards and invitations, the important API endpoints, and where the deeper design docs live.
 
 I also updated the Obsidian project report `PROJ - AUTODISCO - Keyhive Access Control Architecture.md` to reflect the current implementation state after durable Keyhive snapshots, the patched local Keyhive package, the runtime status UI, wrapped contact cards, and invitation acceptance plumbing. The updated vault report was copied back into the AUTODISCO-002 `project-reports/` directory so the ticket-local report stays in sync.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Create a nice README to get people started and link to the relevant docs too. Also update the obsidian vault project report on KeyHive"
+
+**Follow-up user prompt (verbatim):** "copy the project report from obsidian back into the repo (and the other one as well, if we haven't already), use `cp`"
+
+**Assistant interpretation:** Create a project-level onboarding document, refresh the durable Obsidian Keyhive report, and ensure the repo-local ticket reports match the vault copies.
+
+**Inferred user intent:** The user wanted AUTODISCO to become easier for another person to run and understand, with the canonical project report and ticket-local copies kept in sync.
+
+**Commit (code/docs):** 229ebbf — "Add AUTODISCO onboarding README"
+
+### What I did
+
+- Created `/home/manuel/code/wesen/2026-05-09--automerge-discord/README.md`.
+- Included sections for:
+  - project overview;
+  - current capabilities;
+  - repository layout;
+  - prerequisites;
+  - patched local Keyhive package caveat;
+  - `development` and `keyhive` devctl profiles;
+  - chat walkthrough;
+  - contact-card / invite / accept-invite walkthrough;
+  - devctl commands;
+  - npm validation commands;
+  - HTTP API quick reference;
+  - links to AUTODISCO-001, AUTODISCO-002, and AUTODISCO-003 docs;
+  - architecture diagram;
+  - known limitations.
+- Updated `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md` with a current-state implementation update.
+- Copied the refreshed Keyhive report back into:
+
+```text
+ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md
+```
+
+- Later copied both Obsidian project reports back into the repo with `cp` and verified them with `cmp`:
+
+```bash
+cp "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Automerge Discord App Architecture.md" \
+  "ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/01-PROJ - AUTODISCO - Automerge Discord App Architecture.md"
+cp "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md" \
+  "ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md"
+cmp -s "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Automerge Discord App Architecture.md" \
+  "ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/01-PROJ - AUTODISCO - Automerge Discord App Architecture.md"
+cmp -s "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md" \
+  "ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md"
+```
+
+### Why
+
+The project had become runnable and technically rich, but the knowledge was spread across ticket diaries, design docs, changelogs, project reports, and chat context. A top-level README gives future users a first path through the system. The project report update keeps the deeper narrative accurate after the latest Keyhive work.
+
+### What worked
+
+- `README.md` now gives a start-to-finish path for running mock mode, running Keyhive mode, testing chat, and exercising invite acceptance.
+- The Obsidian Keyhive report now reflects the current state rather than the earlier state where persistence and encryption were incomplete.
+- `cp` plus `cmp` confirmed both ticket-local project reports match the Obsidian vault originals.
+
+### What didn't work
+
+No tooling failure occurred. The only issue was process-related: the diary initially summarized the README/report update too briefly and did not capture the `cp`/`cmp` verification details until this follow-up update.
+
+### What I learned
+
+For this project, the README should be the practical entry point, while the Obsidian and ticket reports should remain the long-form technical record. The two serve different readers and should link to each other rather than duplicating every detail.
+
+### What was tricky to build
+
+The tricky part was balancing honesty with usefulness. The README needed to say that the app is runnable and useful as a local prototype, while clearly stating that browser-native Keyhive identity and Keyhive-enforced Automerge sync are not complete yet. Overstating the security posture would be worse than having no README.
+
+### What warrants a second pair of eyes
+
+- Check whether the README's dependency on the ignored local `vendor/keyhive-src/keyhive_wasm/pkg-node-patched` path is sufficiently clear for a fresh checkout.
+- Check whether the Keyhive project report's new current-state section should replace or further amend older sections that still describe persistence/encryption as incomplete.
+- Check whether the report copies in `ttmp/.../project-reports/` should be related with docmgr file metadata if not already related.
+
+### What should be done in the future
+
+When the upstream Keyhive fix lands, update the README dependency caveat and the project report to remove the local-patched-package workflow. If a second-peer or browser-native Keyhive identity flow is added, update the README walkthrough so it demonstrates a true invite between distinct peers.
+
+### Code review instructions
+
+- Start with `/home/manuel/code/wesen/2026-05-09--automerge-discord/README.md` and follow the run instructions as a new user would.
+- Review the Obsidian report at `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/09/PROJ - AUTODISCO - Keyhive Access Control Architecture.md`.
+- Verify the repo-local report copy at `/home/manuel/code/wesen/2026-05-09--automerge-discord/ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/project-reports/02-PROJ - AUTODISCO - Keyhive Access Control Architecture.md`.
+- Validate docs with:
+
+```bash
+docmgr doctor --ticket AUTODISCO-002 --stale-after 30
+```
+
+### Technical details
+
+The README links to the most relevant project docs:
+
+- `ttmp/2026/05/09/AUTODISCO-001--automerge-keyhive-discord-like-chatbot-server/design-doc/01-automerge-keyhive-discord-like-chatbot-server-design-guide.md`
+- `ttmp/2026/05/09/AUTODISCO-002--keyhive-access-control-integration-for-autodisco/design-doc/01-keyhive-access-control-integration-design-guide.md`
+- `ttmp/2026/05/09/AUTODISCO-003--keyhive-tryencrypt-wasm-binding-investigation/reports/01-keyhive-tryencrypt-bug-report.md`
+- `ttmp/2026/05/09/AUTODISCO-003--keyhive-tryencrypt-wasm-binding-investigation/design/01-keyhive-tryencrypt-rust-fix-implementation-guide.md`
