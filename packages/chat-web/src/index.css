@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: ChicagoFLF, Chicago, Geneva, Monaco, ui-monospace, monospace;
+  background: #bdbdbd;
+  color: #111;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { image-rendering: pixelated; }
+button, input { font: inherit; }
+
+:where([data-widget="autodisco"]) {
+  --mac-bg: #bdbdbd;
+  --mac-surface: #f5f5f5;
+  --mac-inset: #e5e5e5;
+  --mac-text: #111111;
+  --mac-muted: #555555;
+  --mac-accent: #222a7f;
+  --mac-danger: #7f1d1d;
+  --mac-border-dark: #111111;
+  --mac-border-mid: #6b6b6b;
+  --mac-border-light: #ffffff;
+  --mac-space-1: 0.25rem;
+  --mac-space-2: 0.5rem;
+  --mac-space-3: 0.75rem;
+  --mac-space-4: 1rem;
+  --mac-space-5: 1.5rem;
+  --mac-font-size: 13px;
+  --mac-line-height: 1.35;
+}
+
+:where([data-widget="autodisco"]) [data-part="mac-button"] {
+  border: 1px solid var(--mac-border-dark);
+  background: var(--mac-surface);
+  color: var(--mac-text);
+  min-height: 30px;
+  padding: 0 var(--mac-space-4);
+  box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid);
+  cursor: pointer;
+}
+:where([data-widget="autodisco"]) [data-part="mac-button"][data-density="compact"] { min-height: 24px; padding-inline: var(--mac-space-2); }
+:where([data-widget="autodisco"]) [data-part="mac-button"][data-variant="primary"] { outline: 2px solid var(--mac-border-dark); outline-offset: 2px; }
+:where([data-widget="autodisco"]) [data-part="mac-button"][data-variant="danger"] { color: var(--mac-danger); }
+:where([data-widget="autodisco"]) [data-part="mac-button"]:active { box-shadow: inset 1px 1px 0 var(--mac-border-mid), inset -1px -1px 0 var(--mac-border-light); }
+:where([data-widget="autodisco"]) [data-part="mac-button"]:disabled { color: var(--mac-muted); cursor: not-allowed; }
+
+:where([data-widget="autodisco"]) [data-part="mac-panel"],
+:where([data-widget="autodisco"]) [data-part="workspace-card"] {
+  border: 2px solid var(--mac-border-dark);
+  background: var(--mac-surface);
+  box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid);
+}
+:where([data-widget="autodisco"]) [data-part="mac-panel"][data-inset="true"] { background: var(--mac-inset); box-shadow: inset 1px 1px 0 var(--mac-border-mid), inset -1px -1px 0 var(--mac-border-light); }
+:where([data-widget="autodisco"]) [data-part="mac-panel-title"] { margin: 0; padding: var(--mac-space-2) var(--mac-space-3); border-bottom: 2px solid var(--mac-border-dark); font-size: var(--mac-font-size); text-transform: uppercase; }
+:where([data-widget="autodisco"]) [data-part="mac-panel-body"] { padding: var(--mac-space-4); display: grid; gap: var(--mac-space-4); }
+
+:where([data-widget="autodisco"]) [data-part="mac-field"] { display: grid; gap: var(--mac-space-1); }
+:where([data-widget="autodisco"]) [data-part="mac-field-label"] { font-weight: 700; }
+:where([data-widget="autodisco"]) [data-part="mac-input"],
+:where([data-widget="autodisco"]) [data-part="composer-input"] { width: 100%; border: 1px solid var(--mac-border-dark); background: #fff; color: var(--mac-text); padding: var(--mac-space-2); box-shadow: inset 1px 1px 0 var(--mac-border-mid), inset -1px -1px 0 var(--mac-border-light); }
+:where([data-widget="autodisco"]) [data-part="mac-field-helper"] { color: var(--mac-muted); font-size: 12px; }
+:where([data-widget="autodisco"]) [data-part="form-error"] { color: var(--mac-danger); margin: 0; }
+
+:where([data-widget="autodisco"]) [data-part="status-pill"] { display: inline-block; border: 1px solid var(--mac-border-dark); padding: 1px var(--mac-space-2); background: var(--mac-surface); text-transform: uppercase; font-size: 11px; }
+:where([data-widget="autodisco"]) [data-part="status-pill"][data-tone="ok"] { color: var(--mac-accent); }
+:where([data-widget="autodisco"]) [data-part="status-pill"][data-tone="warn"] { color: #5c4600; }
+:where([data-widget="autodisco"]) [data-part="status-pill"][data-tone="error"] { color: var(--mac-danger); }
+
+:where([data-widget="autodisco"])[data-part="app-page"] { min-height: 100vh; display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: var(--mac-space-4); padding: var(--mac-space-4); background: radial-gradient(#9c9c9c 1px, transparent 1px), var(--mac-bg); background-size: 4px 4px; font-size: var(--mac-font-size); line-height: var(--mac-line-height); }
+:where([data-widget="autodisco"]) [data-part="hero-panel"] { min-width: 0; }
+:where([data-widget="autodisco"]) [data-part="bootstrap-form"] { display: grid; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] > div { display: flex; align-items: center; justify-content: space-between; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] h3 { margin: 0; }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] dl { display: grid; grid-template-columns: auto 1fr; gap: var(--mac-space-1) var(--mac-space-2); margin: 0; }
+:where([data-widget="autodisco"]) [data-part="workspace-card"] dd { margin: 0; overflow-wrap: anywhere; color: var(--mac-muted); }
+
+:where([data-widget="autodisco"])[data-part="chat-shell"] { min-height: calc(100vh - 2rem); display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 2px solid var(--mac-border-dark); background: var(--mac-surface); box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid); }
+:where([data-widget="autodisco"]) [data-part="channel-sidebar"] { border-right: 2px solid var(--mac-border-dark); padding: var(--mac-space-3); background: var(--mac-inset); }
+:where([data-widget="autodisco"]) [data-part="channel-sidebar"] h2 { margin: 0 0 var(--mac-space-3); font-size: 14px; }
+:where([data-widget="autodisco"]) [data-part="channel-sidebar"] nav { display: grid; gap: var(--mac-space-1); }
+:where([data-widget="autodisco"]) [data-part="channel-item"] { border: 0; background: transparent; text-align: left; padding: var(--mac-space-2); cursor: pointer; }
+:where([data-widget="autodisco"]) [data-part="channel-item"][data-active="true"] { background: var(--mac-border-dark); color: #fff; }
+:where([data-widget="autodisco"]) [data-part="chat-main"] { min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+:where([data-widget="autodisco"]) [data-part="chat-header"] { border-bottom: 2px solid var(--mac-border-dark); padding: var(--mac-space-3); display: flex; align-items: center; justify-content: space-between; }
+:where([data-widget="autodisco"]) [data-part="chat-header"] p { margin: 0; font-weight: 700; }
+:where([data-widget="autodisco"]) [data-part="chat-header"] small { color: var(--mac-muted); }
+:where([data-widget="autodisco"]) [data-part="message-timeline"] { overflow: auto; padding: var(--mac-space-4); display: flex; flex-direction: column; gap: var(--mac-space-3); background: #fff; }
+:where([data-widget="autodisco"]) [data-part="message"] { max-width: 72ch; }
+:where([data-widget="autodisco"]) [data-part="message"][data-own="true"] { align-self: flex-end; }
+:where([data-widget="autodisco"]) [data-part="message-meta"] { display: flex; gap: var(--mac-space-2); color: var(--mac-muted); font-size: 12px; }
+:where([data-widget="autodisco"]) [data-part="message-bubble"] { margin: var(--mac-space-1) 0 0; border: 1px solid var(--mac-border-dark); padding: var(--mac-space-2) var(--mac-space-3); background: var(--mac-surface); box-shadow: inset 1px 1px 0 var(--mac-border-light), inset -1px -1px 0 var(--mac-border-mid); }
+:where([data-widget="autodisco"]) [data-part="message-reactions"] { margin-top: var(--mac-space-1); display: flex; gap: var(--mac-space-1); }
+:where([data-widget="autodisco"]) [data-part="message-reactions"] span { border: 1px solid var(--mac-border-dark); padding: 0 var(--mac-space-1); }
+:where([data-widget="autodisco"]) [data-part="empty-state"] { color: var(--mac-muted); margin: 0; }
+:where([data-widget="autodisco"]) [data-part="composer"] { border-top: 2px solid var(--mac-border-dark); padding: var(--mac-space-3); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--mac-space-3); }
+
+@media (max-width: 900px) {
+  :where([data-widget="autodisco"])[data-part="app-page"] { grid-template-columns: 1fr; }
+  :where([data-widget="autodisco"])[data-part="chat-shell"] { min-height: 70vh; grid-template-columns: 150px minmax(0, 1fr); }
+}

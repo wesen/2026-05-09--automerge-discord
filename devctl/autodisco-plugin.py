@@ -22,6 +22,8 @@ DEFAULT_PORT = "3030"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PUBLIC_BASE_URL = "http://localhost:3030"
 DEFAULT_DATA_DIR = ".devctl/data/autodisco"
+DEFAULT_WEB_PORT = "5174"
+DEFAULT_STORYBOOK_PORT = "6006"
 
 
 def emit(obj: dict[str, Any]) -> None:
@@ -97,6 +99,10 @@ def handle_config_mutate(request_id: str) -> None:
                 "services.chat-server.url": DEFAULT_PUBLIC_BASE_URL,
                 "services.chat-server.health_url": f"{DEFAULT_PUBLIC_BASE_URL}/healthz",
                 "services.chat-server.sync_url": "ws://localhost:3030/sync",
+                "services.web.port": DEFAULT_WEB_PORT,
+                "services.web.url": "http://localhost:5174",
+                "services.storybook.port": DEFAULT_STORYBOOK_PORT,
+                "services.storybook.url": "http://localhost:6006",
             },
             "unset": [],
         }
@@ -151,11 +157,27 @@ def handle_launch_plan(request_id: str, ctx: dict[str, Any], input_obj: dict[str
                     "url": f"http://{health_host}:{port}/healthz",
                     "timeout_ms": 30000,
                 },
-            }
+            },
+            {
+                "name": "web",
+                "cwd": ".",
+                "command": ["npm", "run", "dev:web"],
+                "env": {"VITE_API_BASE_URL": public_base_url, "VITE_DEV_PORT": DEFAULT_WEB_PORT},
+                "health": {"type": "http", "url": "http://127.0.0.1:5174", "timeout_ms": 30000},
+            },
+            {
+                "name": "storybook",
+                "cwd": ".",
+                "command": ["npm", "run", "storybook", "--", "--no-open"],
+                "env": {"VITE_API_BASE_URL": public_base_url},
+                "health": {"type": "http", "url": "http://127.0.0.1:6006", "timeout_ms": 30000},
+            },
         ],
         "notes": [
             f"HTTP API: {public_base_url}",
             f"Automerge sync: ws://localhost:{port}/sync",
+            "Vite web: http://localhost:5174",
+            "Storybook: http://localhost:6006",
         ],
     })
 
@@ -168,7 +190,7 @@ def handle_command_run(request_id: str, ctx: dict[str, Any], input_obj: dict[str
 
     try:
         if name == "check":
-            for argv in (["npm", "run", "typecheck"], ["npm", "run", "build"], ["npm", "test"]):
+            for argv in (["npm", "run", "typecheck"], ["npm", "run", "build"], ["npm", "test"], ["npm", "--workspace", "@autodisco/chat-web", "run", "build-storybook"]):
                 code = run_command(list(argv), root)
                 if code != 0:
                     response_ok(request_id, {"exit_code": code})

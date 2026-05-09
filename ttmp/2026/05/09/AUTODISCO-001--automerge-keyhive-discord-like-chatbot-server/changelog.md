@@ -46,3 +46,13 @@ Added devctl setup for supervised local server runs and dynamic check/bootstrap 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — devctl config
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — devctl plugin
 
+
+## 2026-05-09
+
+Added the first AUTODISCO web client package with React, Vite, Tailwind, RTK Query bootstrap support, Storybook/MSW, a Mac OS 1-inspired component system, and devctl services for Vite and Storybook. Moved the web dev server to explicit port 5174 after discovering 5173 belonged to another local app.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web — React/Vite/Storybook web package
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py — devctl launch plan now includes chat-server, web, and Storybook
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml — updated development profile description

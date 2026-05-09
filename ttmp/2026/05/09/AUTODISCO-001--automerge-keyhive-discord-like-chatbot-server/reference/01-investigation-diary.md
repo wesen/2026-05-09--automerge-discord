@@ -39,7 +39,7 @@ RelatedFiles:
       Note: Experiment whose result and failure were recorded
 ExternalSources: []
 Summary: Chronological diary for the Automerge + Keyhive Discord-like chatbot server research ticket.
-LastUpdated: 2026-05-09T12:48:00-04:00
+LastUpdated: 2026-05-09T13:15:00-04:00
 WhatFor: Use to understand what was researched, what commands were run, and what validation was performed.
 WhenToUse: When continuing the ticket or reviewing evidence behind the design guide.
 ---
@@ -896,3 +896,129 @@ Primary files:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/.gitignore`
+
+
+## Step 11: Add the React/Vite/Storybook web client and devctl frontend services
+
+I added the first browser UI package for AUTODISCO and extended the development profile so `devctl up` now supervises the backend relay, the Vite web client, and Storybook together. The UI is intentionally Mac OS 1 inspired: monochrome surfaces, one-pixel borders, inset/raised panel effects, and no menu bar or window chrome.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Add Vite and Storybook to the `devctl` development profile if not already present, then continue with the remaining development work."
+
+**Follow-up correction:** The user noted that port `5173` was already another app and that AUTODISCO was on `5174`.
+
+**Assistant interpretation:** Complete the web-client scaffold, keep Storybook organized by component hierarchy, wire Vite and Storybook into devctl, and avoid colliding with the user's existing app on port 5173.
+
+**Inferred user intent:** The user wants a real frontend development loop that can be launched through devctl and a component system that can be reviewed in Storybook before wiring live Automerge state.
+
+### What I did
+
+- Added the `packages/chat-web` React/Vite package.
+- Added RTK Query bootstrap plumbing in `src/features/bootstrap/bootstrapApi.ts` and Redux store setup in `src/app/store.ts`.
+- Added Storybook configuration under `packages/chat-web/.storybook/`.
+- Added Tailwind/PostCSS configuration and global CSS tokens/parts for the monochrome Mac aesthetic.
+- Built component folders matching the requested hierarchy:
+  - atoms: `MacButton`, `MacPanel`, `MacTextField`, `StatusPill`
+  - molecules: `BootstrapWorkspaceForm`, `Composer`, `MessageBubble`, `WorkspaceCard`
+  - organisms: `ChannelSidebar`, `MessageTimeline`, `ChatShell`
+  - page: `HomePage`
+- Added Storybook stories per component/page using titles such as `Atoms/MacButton`, `Molecules/Composer`, `Organisms/ChatShell`, and `Pages/HomePage`.
+- Wired MSW for Storybook and generated `packages/chat-web/public/mockServiceWorker.js`.
+- Added root scripts for `dev:web` and `storybook`, plus root `build`/`typecheck` inclusion for `packages/chat-web`.
+- Extended `devctl/autodisco-plugin.py` so the development launch plan includes three services:
+  - `chat-server` on `3030`
+  - `web` on `5174`
+  - `storybook` on `6006`
+- Updated the dynamic `devctl check` command to include Storybook build validation.
+- Added an inline SVG favicon to avoid a noisy browser 404 during Playwright review.
+
+### Why
+
+The project needed a browser-facing development environment and component system before live Automerge UI wiring. The Storybook-first structure gives small reviewable components and keeps the Mac OS 1 theme centralized through `data-widget`/`data-part` styling hooks, following the React modular theming guidance.
+
+### What worked
+
+Validation succeeded with:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+npm --workspace @autodisco/chat-web run build-storybook
+devctl check --timeout 300s
+```
+
+The devctl plan showed all three expected services:
+
+```bash
+devctl plan --timeout 10s
+```
+
+The supervised service loop worked after moving the web client to port 5174:
+
+```bash
+devctl up --force --timeout 60s
+# visited http://127.0.0.1:5174 with Playwright
+devctl down --timeout 30s
+```
+
+Manual Playwright review confirmed the AUTODISCO page loaded at `http://127.0.0.1:5174`, rendered the monochrome UI, and created a workspace through the real bootstrap API.
+
+### What didn't work
+
+The first devctl web run attempted port `5173`, but another application was already bound there. Vite automatically moved to `5174`, while devctl health checks still expected `5173`. The user caught this mismatch. I fixed it by making `5174` the explicit AUTODISCO Vite port, setting `--strictPort`, passing `VITE_DEV_PORT=5174`, and updating devctl config/notes/health checks.
+
+TypeScript initially failed because `.storybook/*.ts` was included while `rootDir` was `src`:
+
+```text
+TS6059: File 'packages/chat-web/.storybook/main.ts' is not under 'rootDir' 'packages/chat-web/src'.
+```
+
+I corrected the package TypeScript config so app typechecking focuses on `src`; Storybook remains validated by `build-storybook`.
+
+`MacPanel` initially used `HTMLAttributes<section>`, which is invalid TypeScript because `section` is not a type. I changed it to `HTMLAttributes<HTMLElement>`.
+
+Storybook initially warned about duplicate config files because TypeScript emitted `.storybook/main.js`/`.d.ts` files. I removed the generated files and excluded `.storybook` from the app `tsconfig`.
+
+### What I learned
+
+The current web app only uses Automerge indirectly through the bootstrap endpoint. The backend creates real Automerge documents and returns real Automerge URLs, but the visible chat shell still renders fixtures. A meaningful multi-session distributed test requires adding browser Automerge Repo/DocHandle wiring or, first, a Node integration test with two independent Automerge Repo clients connected to the relay.
+
+### What was tricky to build
+
+The subtle issue was port ownership. Because Vite helpfully auto-increments ports, the page can appear to work while devctl is checking a different application. `--strictPort` plus an explicit project port avoids accidentally validating someone else's service.
+
+### What warrants a second pair of eyes
+
+- Review whether `5174` should remain the reserved AUTODISCO web port.
+- Review the CSS contract and component naming before the UI grows further.
+- Confirm whether Storybook should be part of `devctl up` by default or moved to a separate profile later.
+- Review the next Automerge live-client design before replacing fixtures.
+
+### What should be done in the future
+
+- Add a two-peer Automerge Repo integration test through the relay.
+- Add a persistence/restart sync test using the server storage adapter.
+- Wire the browser UI to a live Automerge Repo and `DocHandle`.
+- Replace fixture messages with live document subscription state.
+- Add a Playwright two-context test once the browser is a real Automerge peer.
+
+### Code review instructions
+
+- Start with `packages/chat-web/package.json` and `packages/chat-web/vite.config.ts` for the web package scripts and port.
+- Review `.storybook/main.ts` and `.storybook/preview.ts` for Storybook/MSW setup.
+- Review `src/index.css` for the Mac OS 1 parts/tokens styling contract.
+- Review components in atoms, molecules, organisms, then `pages/HomePage`.
+- Review `devctl/autodisco-plugin.py` to confirm the launch plan includes `chat-server`, `web`, and `storybook`.
+- Validate with the commands listed above.
+
+### Technical details
+
+Primary files added or changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/devctl/autodisco-plugin.py`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/.devctl.yaml`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/package-lock.json`

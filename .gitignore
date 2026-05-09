@@ -3,6 +3,7 @@ node_modules/
 .autodisco-data/
 dist/
 build/
+storybook-static/
 coverage/
 .env
 .env.*

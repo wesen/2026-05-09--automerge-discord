@@ -48,6 +48,18 @@
 - [ ] Wire mock ACL checks into chat-client mutation wrappers.
 - [ ] Wire mock ACL identity into relay sharing/admission decisions.
 
+### Phase 3.5: Web client and component system
+
+- [x] Scaffold `packages/chat-web` with React, Vite, TypeScript, Tailwind, RTK Query, and Storybook.
+- [x] Add Mac OS 1-inspired global styling contract with `data-widget="autodisco"` and `data-part` hooks.
+- [x] Build atom, molecule, organism, and page component folders with matching Storybook stories.
+- [x] Wire MSW into Storybook for bootstrap endpoint stories.
+- [x] Add Vite web and Storybook services to the devctl development launch plan.
+- [x] Move the AUTODISCO web service to explicit port `5174` with strict port checking to avoid the user's existing app on `5173`.
+- [x] Validate with typecheck, build, tests, Storybook build, devctl plan/up/check, and Playwright smoke review.
+- [ ] Add browser Automerge Repo/DocHandle wiring so the web UI uses live distributed state instead of fixtures.
+- [ ] Add Playwright two-context sync tests after live browser Automerge wiring.
+
 ### Phase 4: Keyhive integration spike
 
 - [ ] Spike `keyhive_wasm` in the intended runtime.

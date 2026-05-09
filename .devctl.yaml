@@ -4,7 +4,7 @@ profile:
 profiles:
   development:
     display_name: Development
-    description: Run the AUTODISCO Automerge relay/app server locally.
+    description: Run the AUTODISCO Automerge relay, Vite web client on :5174, and Storybook locally.
     plugins:
       - autodisco
     env:
