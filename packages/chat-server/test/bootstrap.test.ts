@@ -70,6 +70,7 @@ describe('bootstrap HTTP API', () => {
         agent: { id: string; kind: string }
         target: { id: string; kind: string }
         access: string
+        invitation: unknown
       }
       expect(inviteResponse.status).toBe(201)
       expect(inviteBody.invitationId).toMatch(/^inv_/)
@@ -77,6 +78,17 @@ describe('bootstrap HTTP API', () => {
       expect(inviteBody.agent).toEqual({ id: 'mem_peer', kind: 'individual' })
       expect(inviteBody.target).toEqual({ id: body.keyhive.workspaceDocumentId, kind: 'document' })
       expect(inviteBody.access).toBe('read')
+
+      const acceptResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations/accept`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ invitation: inviteBody.invitation }),
+      })
+      const acceptBody = (await acceptResponse.json()) as { accepted: boolean; mode: string; membershipEventCount: number }
+      expect(acceptResponse.status).toBe(200)
+      expect(acceptBody.accepted).toBe(true)
+      expect(acceptBody.mode).toBe('mock')
+      expect(acceptBody.membershipEventCount).toBe(0)
 
       const denyResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations`, {
         method: 'POST',
@@ -157,10 +169,22 @@ describe('bootstrap HTTP API', () => {
             contactCard: { keyhiveContactCardJson: contactCard },
           }),
         })
-        const inviteBody = (await inviteResponse.json()) as { mode: string; target: { id: string } }
+        const inviteBody = (await inviteResponse.json()) as { mode: string; target: { id: string }; invitation: unknown; membershipEventCount: number }
         expect(inviteResponse.status).toBe(201)
         expect(inviteBody.mode).toBe('keyhive-experimental')
         expect(inviteBody.target.id).toBe(workspaceDocumentId)
+        expect(inviteBody.membershipEventCount).toBeGreaterThan(0)
+
+        const acceptResponse = await fetch(`http://127.0.0.1:${address.port}/api/bootstrap/invitations/accept`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ invitation: inviteBody.invitation }),
+        })
+        const acceptBody = (await acceptResponse.json()) as { accepted: boolean; mode: string; membershipEventCount: number }
+        expect(acceptResponse.status).toBe(200)
+        expect(acceptBody.accepted).toBe(true)
+        expect(acceptBody.mode).toBe('keyhive-experimental')
+        expect(acceptBody.membershipEventCount).toBe(inviteBody.membershipEventCount)
       } finally {
         second.runtime.wss.close()
         await new Promise<void>((resolve, reject) => secondServer.close((err) => (err ? reject(err) : resolve())))

@@ -84,7 +84,8 @@ button, input, textarea, select { font: inherit; max-width: 100%; }
 :where([data-widget="autodisco"]) [data-part="hero-panel"] { min-width: 0; }
 :where([data-widget="autodisco"]) [data-part="bootstrap-form"],
 :where([data-widget="autodisco"]) [data-part="open-workspace-form"],
-:where([data-widget="autodisco"]) [data-part="invitation-form"] { min-width: 0; display: grid; gap: var(--mac-space-3); }
+:where([data-widget="autodisco"]) [data-part="invitation-form"],
+:where([data-widget="autodisco"]) [data-part="accept-invitation-form"] { min-width: 0; display: grid; gap: var(--mac-space-3); }
 :where([data-widget="autodisco"]) [data-part="workspace-card"],
 :where([data-widget="autodisco"]) [data-part="identity-card"] { padding: var(--mac-space-3); display: grid; gap: var(--mac-space-2); }
 :where([data-widget="autodisco"]) [data-part="workspace-card-header"],

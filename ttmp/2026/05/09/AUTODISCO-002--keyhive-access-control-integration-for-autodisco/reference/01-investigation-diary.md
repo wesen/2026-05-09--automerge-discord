@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T16:56:00-04:00
+LastUpdated: 2026-05-09T17:02:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -1354,4 +1354,41 @@ The Keyhive contact-card copy button was technically copying a valid raw Keyhive
 ```bash
 npm run typecheck
 npm --workspace @autodisco/chat-web run build
+```
+
+## Step 19: Add invitation acceptance plumbing
+
+After creating a real Keyhive invitation, the next UX gap was obvious: the app copied a useful `autodisco.invitation.v1` payload, but there was nowhere in the UI to paste it back and ingest its membership events.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Ok, so I can create the invite like this: ... now what?"
+
+**Assistant interpretation:** The prototype needs at least a visible acceptance step so users can paste the generated invitation and see the membership-event ingestion path execute.
+
+### What changed
+
+- Implemented `POST /api/bootstrap/invitations/accept` in `packages/chat-server/src/http/bootstrap.ts`.
+- The accept endpoint accepts either the invitation object directly or `{ invitation: ... }`.
+- It decodes base64 `membershipEvents` and calls `acl.ingestMembershipEvents(...)`.
+- Added RTK Query accept-invitation types and mutation in `packages/chat-web/src/features/bootstrap/bootstrapApi.ts`.
+- Added `AcceptInvitationForm` as a new molecule with Storybook story.
+- Added the acceptance form to `HomePage`.
+- When `Create Invite` succeeds, the generated invitation JSON is copied to the clipboard and also prefilled into the new accept form.
+- Added server tests for accepting both mock and Keyhive experimental invitations.
+
+### What this proves
+
+This proves the invitation payload is structurally useful: the membership events can be decoded and handed back to the ACL adapter. In Keyhive mode, this invokes real Keyhive event ingestion.
+
+### Remaining limitation
+
+The acceptance form currently ingests into the same running backend adapter. It is a working plumbing step, but a complete product needs separate browser-native or peer-server identities so the invited peer accepts the invitation into its own Keyhive state.
+
+### Validation
+
+```bash
+npm run typecheck
+npm --workspace @autodisco/chat-server test
+npm --workspace @autodisco/chat-web run build-storybook
 ```

@@ -39,6 +39,20 @@ export interface CreateInvitationResponse {
   invitation: unknown
 }
 
+export interface AcceptInvitationRequest {
+  invitation: unknown
+}
+
+export interface AcceptInvitationResponse {
+  mode: AclMode
+  accepted: true
+  agent?: CreateInvitationResponse['agent']
+  target?: { id: string; kind: 'document' }
+  access?: CreateInvitationRequest['access']
+  membershipEventCount: number
+  ingestedEventCount: number
+}
+
 export interface RevokeInvitationRequest {
   workspaceDocumentId: string
   agent: CreateInvitationResponse['agent']
@@ -72,6 +86,13 @@ export const bootstrapApi = createApi({
         body,
       }),
     }),
+    acceptInvitation: builder.mutation<AcceptInvitationResponse, AcceptInvitationRequest>({
+      query: (body) => ({
+        url: '/invitations/accept',
+        method: 'POST',
+        body,
+      }),
+    }),
     revokeInvitation: builder.mutation<RevokeInvitationResponse, RevokeInvitationRequest>({
       query: (body) => ({
         url: '/invitations/revoke',
@@ -82,4 +103,4 @@ export const bootstrapApi = createApi({
   }),
 })
 
-export const { useGetStatusQuery, useCreateWorkspaceMutation, useCreateInvitationMutation, useRevokeInvitationMutation } = bootstrapApi
+export const { useGetStatusQuery, useCreateWorkspaceMutation, useCreateInvitationMutation, useAcceptInvitationMutation, useRevokeInvitationMutation } = bootstrapApi

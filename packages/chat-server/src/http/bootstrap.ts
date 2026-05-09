@@ -107,10 +107,27 @@ export function createBootstrapRouter(repo: Repo, config: ServerConfig, acl: Acc
     }
   })
 
-  router.post('/invitations/accept', (_req: Request, res: Response) => {
-    res.status(501).json({
-      error: 'Keyhive invitation acceptance is reserved for Phase 4',
-    })
+  router.post('/invitations/accept', async (req: Request, res: Response) => {
+    try {
+      const invitation = parseAcceptInvitationRequest(req.body)
+      if (!invitation) {
+        res.status(400).json({ error: 'invitation with membershipEvents is required' })
+        return
+      }
+      const events = invitation.membershipEvents.map((event) => new Uint8Array(Buffer.from(event, 'base64')))
+      const ingested = await acl.ingestMembershipEvents(events)
+      res.status(200).json({
+        mode: config.aclMode,
+        accepted: true,
+        agent: invitation.agent,
+        target: invitation.target,
+        access: invitation.access,
+        membershipEventCount: events.length,
+        ingestedEventCount: ingested.length,
+      })
+    } catch (error) {
+      respondWithError(res, error)
+    }
   })
 
   return router
@@ -129,6 +146,30 @@ function parseInvitationRequest(body: unknown): { workspaceDocumentId: string; c
   if (!workspaceDocumentId || value.contactCard === undefined) return null
   const access = typeof value.access === 'string' && CHAT_ACCESSES.includes(value.access as ChatAccess) ? (value.access as ChatAccess) : 'read'
   return { workspaceDocumentId, contactCard: value.contactCard, access }
+}
+
+function parseAcceptInvitationRequest(body: unknown): {
+  agent?: { id: string; kind: 'individual' | 'group' | 'bot' }
+  target?: { id: string; kind: 'document' }
+  access?: ChatAccess
+  membershipEvents: string[]
+} | null {
+  const invitation = body && typeof body === 'object' && 'invitation' in body ? (body as { invitation?: unknown }).invitation : body
+  if (!invitation || typeof invitation !== 'object') return null
+  const value = invitation as {
+    agent?: { id?: unknown; kind?: unknown }
+    target?: { id?: unknown; kind?: unknown }
+    access?: unknown
+    membershipEvents?: unknown
+  }
+  if (!Array.isArray(value.membershipEvents) || !value.membershipEvents.every((event) => typeof event === 'string')) return null
+  const access = typeof value.access === 'string' && CHAT_ACCESSES.includes(value.access as ChatAccess) ? (value.access as ChatAccess) : undefined
+  const agentKind = value.agent?.kind as 'individual' | 'group' | 'bot' | undefined
+  const agent = value.agent?.id && (agentKind === 'individual' || agentKind === 'group' || agentKind === 'bot')
+    ? { id: String(value.agent.id), kind: agentKind }
+    : undefined
+  const target = value.target?.id && value.target.kind === 'document' ? { id: String(value.target.id), kind: 'document' as const } : undefined
+  return { agent, target, access, membershipEvents: value.membershipEvents }
 }
 
 function parseRevokeRequest(body: unknown): { workspaceDocumentId: string; agent: { id: string; kind: 'individual' | 'group' | 'bot' } } | null {

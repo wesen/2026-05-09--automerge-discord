@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Provider } from 'react-redux'
 import type { ChannelId } from '@autodisco/chat-core'
-import { useCreateInvitationMutation, useCreateWorkspaceMutation, useGetStatusQuery } from '../../features/bootstrap/bootstrapApi.js'
+import { useAcceptInvitationMutation, useCreateInvitationMutation, useCreateWorkspaceMutation, useGetStatusQuery } from '../../features/bootstrap/bootstrapApi.js'
 import { canCommentInMockWorkspace } from '../../features/access/mockPermissions.js'
 import { store } from '../../app/store.js'
 import { fixtureIds, fixtureWorkspace } from '../../shared/fixtures.js'
 import { MacPanel } from '../../components/atoms/MacPanel/index.js'
+import { AcceptInvitationForm, type AcceptInvitationFormValue } from '../../components/molecules/AcceptInvitationForm/index.js'
 import { BootstrapWorkspaceForm } from '../../components/molecules/BootstrapWorkspaceForm/index.js'
 import { IdentityCard } from '../../components/molecules/IdentityCard/index.js'
 import { InvitationForm, type InvitationFormValue } from '../../components/molecules/InvitationForm/index.js'
@@ -40,12 +41,14 @@ export function HomePageContent() {
   const [activeWorkspace, setActiveWorkspace] = useState<ActiveWorkspace | undefined>(() => loadActiveWorkspace())
   const [logs, setLogs] = useState<LogEntry[]>(() => [{ id: crypto.randomUUID(), at: new Date().toISOString(), level: 'info', message: 'AUTODISCO client booted' }])
   const [logOpen, setLogOpen] = useState(false)
+  const [latestInvitationJson, setLatestInvitationJson] = useState('')
   const appendLog = useCallback((level: LogLevel, message: string, detail?: string) => {
     setLogs((entries) => [{ id: crypto.randomUUID(), at: new Date().toISOString(), level, message, detail }, ...entries].slice(0, 100))
   }, [])
   const { data: bootstrapStatus } = useGetStatusQuery()
   const [createWorkspace, result] = useCreateWorkspaceMutation()
   const [createInvitation, invitationResult] = useCreateInvitationMutation()
+  const [acceptInvitation, acceptInvitationResult] = useAcceptInvitationMutation()
   const workspaceState = useWorkspaceDoc(activeWorkspace?.workspaceDocUrl, activeWorkspace?.syncUrl)
   useEnsureWorkspaceReady(workspaceState.handle, workspaceState.doc, identity)
   const actions = useWorkspaceActions(workspaceState.handle, identity)
@@ -118,10 +121,23 @@ export function HomePageContent() {
       const contactCard = JSON.parse(value.contactCardJson) as unknown
       appendLog('info', `Creating ${aclMode} invitation`, `${workspaceDocumentId} · ${value.access}`)
       const invitation = await createInvitation({ workspaceDocumentId, contactCard, access: value.access }).unwrap()
-      await copyToClipboard(JSON.stringify(invitation.invitation, null, 2))
+      const invitationJson = JSON.stringify(invitation.invitation, null, 2)
+      setLatestInvitationJson(invitationJson)
+      await copyToClipboard(invitationJson)
       appendLog('ok', `Created and copied ${invitation.mode} invitation`, `${invitation.invitationId} · ${invitation.agent.id} · ${invitation.access}`)
     } catch (error) {
       appendLog('error', 'Create invitation failed', error instanceof Error ? error.message : String(error))
+    }
+  }
+
+  async function acceptWorkspaceInvitation(value: AcceptInvitationFormValue) {
+    try {
+      const invitation = JSON.parse(value.invitationJson) as unknown
+      appendLog('info', `Accepting ${aclMode} invitation`)
+      const accepted = await acceptInvitation({ invitation }).unwrap()
+      appendLog('ok', `Accepted ${accepted.mode} invitation`, `${accepted.membershipEventCount} events · ${accepted.ingestedEventCount} new`)
+    } catch (error) {
+      appendLog('error', 'Accept invitation failed', error instanceof Error ? error.message : String(error))
     }
   }
 
@@ -170,6 +186,12 @@ export function HomePageContent() {
             isLoading={invitationResult.isLoading}
             error={invitationResult.isError ? 'Could not create invitation.' : undefined}
             onCreateInvitation={(value) => void createWorkspaceInvitation(value)}
+          />
+          <AcceptInvitationForm
+            initialInvitationJson={latestInvitationJson}
+            isLoading={acceptInvitationResult.isLoading}
+            error={acceptInvitationResult.isError ? 'Could not accept invitation.' : undefined}
+            onAcceptInvitation={(value) => void acceptWorkspaceInvitation(value)}
           />
           <WorkspaceCard
             name={workspaceState.doc?.name ?? activeWorkspace?.label ?? 'No workspace yet'}

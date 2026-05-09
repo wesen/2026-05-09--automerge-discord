@@ -155,3 +155,15 @@ Made copied Keyhive contact cards more understandable. The web UI now wraps the 
 
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — Keyhive contact-card envelope copy behavior
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx — helper text for Keyhive contact-card envelope
+
+## 2026-05-09
+
+Added invitation acceptance plumbing. The backend now implements `POST /api/bootstrap/invitations/accept`, decoding invitation membership events and ingesting them through the ACL adapter. The web UI includes an `AcceptInvitationForm`, create-invite results are copied and prefilled for acceptance, and Storybook/server tests cover the new flow.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/src/http/bootstrap.ts — invitation accept endpoint
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — accept endpoint coverage
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts — accept mutation
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/AcceptInvitationForm/AcceptInvitationForm.tsx — accept invitation UI
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — create/accept invitation flow wiring
