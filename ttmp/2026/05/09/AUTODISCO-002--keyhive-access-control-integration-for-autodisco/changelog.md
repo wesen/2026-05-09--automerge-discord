@@ -49,3 +49,13 @@ Implemented Phase K3 mock invitations: server exposes create/revoke invitation e
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-server/test/bootstrap.test.ts — invitation allow/deny/revoke assertions
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts — invitation RTK Query mutations
 - /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm — invite UI and stories
+
+## 2026-05-09
+
+Implemented Phase K4 mock app-layer checks: browser send-message now passes through a mock comment permission helper with visible denial logs, invite/revoke admin checks remain server-side, and `@autodisco/chat-acl` now has Vitest coverage for grants, missing grants, nested contact cards, invite, and revoke.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/access/mockPermissions.ts — mock comment permission helper
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx — visible permission-denied logging before send
+- /home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/access.test.ts — ACL grant/missing-grant tests

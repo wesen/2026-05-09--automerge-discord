@@ -35,7 +35,7 @@ ExternalSources:
     - https://www.inkandswitch.com/keyhive/notebook/
     - https://github.com/inkandswitch/keyhive
 Summary: Chronological investigation diary for the AUTODISCO Keyhive access-control integration design ticket.
-LastUpdated: 2026-05-09T14:32:00-04:00
+LastUpdated: 2026-05-09T14:38:00-04:00
 WhatFor: Use this to understand how the Keyhive integration design guide was produced, what evidence was inspected, and what remains to validate.
 WhenToUse: When continuing AUTODISCO-002, reviewing the design guide, or implementing the first Keyhive/ACL work.
 ---
@@ -735,3 +735,83 @@ Primary files changed:
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/bootstrap/bootstrapApi.ts`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/components/molecules/InvitationForm/InvitationForm.tsx`
 - `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+
+## Step 9: Implement Phase K4 mock app-layer ACL checks and missing-grant tests
+
+I added lightweight app-layer permission checks for the mock access-control mode. These checks are intentionally not presented as real security; they are UI/server guardrails that make the future Keyhive enforcement points explicit.
+
+### Prompt Context
+
+**User prompt (verbatim):** Continuing the same task sequence.
+
+**Assistant interpretation:** Keep closing the implementation backlog by adding the mock enforcement and visible-denial pieces before moving to the experimental Keyhive spike.
+
+**Inferred user intent:** The user wants the codebase to exercise and test the access-control seam, including failure paths, not only happy paths.
+
+### What I did
+
+- Added `canCommentInMockWorkspace()` in the web client as a clear mock permission gate before sending messages.
+- Updated `HomePage.sendMessage()` to log `Permission denied: cannot comment` and skip the Automerge mutation if the local mock permission decision fails.
+- Confirmed invite/revoke operations already pass through `acl.assertCanAdmin()` server-side from Phase K3.
+- Added `vitest` coverage for the ACL package by adding a `test` script to `packages/chat-acl`.
+- Added `packages/chat-acl/test/access.test.ts` to cover:
+  - admin access for created workspace documents;
+  - denied comment access for a missing grant;
+  - nested contact-card parsing;
+  - invite/revoke method flow.
+- Re-ran full validation and kept Storybook/browser sync green.
+- Marked Phase K4 tasks complete.
+
+### Why
+
+Mock ACL should still show where permission checks belong. The checks added here make it much harder to accidentally bury all access-control behavior in UI affordances alone.
+
+### What worked
+
+Validation passed:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm --workspace @autodisco/chat-web run build-storybook
+devctl test-web-sync --timeout 120s
+```
+
+The root test suite now includes `@autodisco/chat-acl` tests in addition to core/server tests.
+
+### What didn't work
+
+No blocking implementation failures occurred in this step.
+
+### What I learned
+
+The mock permission path is useful as documentation-by-code: it shows the future enforcement points, but the product copy/debug logs still need to be explicit that this is not security until real Keyhive is integrated.
+
+### What was tricky to build
+
+The browser cannot authoritatively enforce ACL. I kept the browser check named `mock` and limited it to preventing obvious invalid local mutations, while server invite/revoke remains the stronger adapter-backed check.
+
+### What warrants a second pair of eyes
+
+- Review whether the mock browser permission helper is too permissive because `useEnsureWorkspaceReady()` auto-adds the local member.
+- Review whether future real Keyhive mode should disable auto-add-member behavior for opened/joined documents.
+
+### What should be done in the future
+
+Proceed to Phase K5: run a focused Keyhive WASM/API spike, record exact installation/API gaps, and decide whether a real experimental adapter can be attempted now.
+
+### Code review instructions
+
+- Review `packages/chat-web/src/features/access/mockPermissions.ts` and `HomePage.sendMessage()`.
+- Review `packages/chat-acl/test/access.test.ts` and the new `packages/chat-acl/package.json` test script.
+- Re-run the validation commands listed above.
+
+### Technical details
+
+Primary files changed:
+
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/features/access/mockPermissions.ts`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-web/src/pages/HomePage/HomePage.tsx`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/package.json`
+- `/home/manuel/code/wesen/2026-05-09--automerge-discord/packages/chat-acl/test/access.test.ts`

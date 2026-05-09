@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Provider } from 'react-redux'
 import type { ChannelId } from '@autodisco/chat-core'
 import { useCreateInvitationMutation, useCreateWorkspaceMutation } from '../../features/bootstrap/bootstrapApi.js'
+import { canCommentInMockWorkspace } from '../../features/access/mockPermissions.js'
 import { store } from '../../app/store.js'
 import { fixtureIds, fixtureWorkspace } from '../../shared/fixtures.js'
 import { MacPanel } from '../../components/atoms/MacPanel/index.js'
@@ -83,6 +84,11 @@ export function HomePageContent() {
   }
 
   function sendMessage(channelId: ChannelId, body: string) {
+    const decision = canCommentInMockWorkspace(workspaceState.doc, identity.memberId, channelId)
+    if (!decision.allowed) {
+      appendLog('error', 'Permission denied: cannot comment', decision.reason)
+      return
+    }
     appendLog('info', 'Sending message through Automerge change', `${channelId}: ${body}`)
     actions.send(channelId, body)
   }

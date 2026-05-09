@@ -40,10 +40,10 @@
 
 ### Phase K4: App-layer ACL enforcement
 
-- [ ] Check comment access before browser send-message mutation.
-- [ ] Check admin access before invite/revoke operations.
-- [ ] Add visible permission-denied log/UI feedback.
-- [ ] Add unit/integration tests for missing-grant behavior.
+- [x] Check comment access before browser send-message mutation.
+- [x] Check admin access before invite/revoke operations.
+- [x] Add visible permission-denied log/UI feedback.
+- [x] Add unit/integration tests for missing-grant behavior.
 
 ### Phase K5: Keyhive WASM spike
 
